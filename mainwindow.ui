@@ -56,6 +56,32 @@
      <string>Далее</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="buttonRunPy">
+    <property name="geometry">
+     <rect>
+      <x>950</x>
+      <y>30</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Run script</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelIsRunning">
+    <property name="geometry">
+     <rect>
+      <x>1060</x>
+      <y>30</y>
+      <width>55</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Inactive</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

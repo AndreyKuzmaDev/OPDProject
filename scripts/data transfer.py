@@ -88,30 +88,31 @@ def write(data, cur):
     return True
 
 
-write_try = False
-success_cnt = 0
-data_failed_cnt = 0
-write_failed_cnt = 0
-start_point = 3001
-number = 10
-con = sqlite3.connect('delicious.db')
-cur = con.cursor()
-for i in range(start_point, start_point+number):
-    data = get_data(i)
-    if data:
-        write_try = write(data, cur)
-    else:
-        print(f"{i} failed to get data")
-        data_failed_cnt += 1
-        continue
+def run(beg, end):
+    write_try = False
+    success_cnt = 0
+    data_failed_cnt = 0
+    write_failed_cnt = 0
+    start_point = beg
+    number = end - beg
+    con = sqlite3.connect('delicious.db')
+    cur = con.cursor()
+    for i in range(start_point, start_point + number):
+        data = get_data(i)
+        if data:
+            write_try = write(data, cur)
+        else:
+            print(f"{i} failed to get data")
+            data_failed_cnt += 1
+            continue
 
-    if write_try:
-        print(f"{data['id']} done successfully!")
-        success_cnt += 1
-    else:
-        print(f"{data['id']} can't be written")
-        write_failed_cnt += 1
-    con.commit()
-    if (i - start_point + 1) % 25 == 0:
-        print(f"""{i - start_point + 1} of {number} processed\t{success_cnt} done successfully
-{data_failed_cnt} failed to get data\t{write_failed_cnt} failed to write""")
+        if write_try:
+            print(f"{data['id']} done successfully!")
+            success_cnt += 1
+        else:
+            print(f"{data['id']} can't be written")
+            write_failed_cnt += 1
+        con.commit()
+        if (i - start_point + 1) % 25 == 0:
+            print(f"""{i - start_point + 1} of {number} processed\t{success_cnt} done successfully
+    {data_failed_cnt} failed to get data\t{write_failed_cnt} failed to write""")

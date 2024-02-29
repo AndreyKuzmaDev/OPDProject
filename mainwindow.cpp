@@ -1,4 +1,4 @@
-
+#include <Python.h>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -30,6 +30,8 @@ MainWindow::~MainWindow()
 void MainWindow::on_search_clicked()
 {
     setlocale(LC_ALL, "RUS");
+
+
 
     QString search;
         search = ui->lineEdit->text();
@@ -111,3 +113,28 @@ void MainWindow::on_search_clicked()
         else return;
     }
 
+
+void MainWindow::on_buttonRunPy_clicked()
+{
+    Py_Initialize();
+
+    PyObject *pName, *pModule, *pDict, *pFunc, *pValue;
+
+    pName = PyUnicode_FromString("scripts/data transfer.py");
+
+    pModule = PyImport_Import(pName);
+
+    pDict = PyModule_GetDict(pModule);
+
+    pFunc = PyDict_GetItemString(pDict, "run");
+
+    if (PyCallable_Check(pFunc))
+    {
+        ui->labelIsRunning->setText(QString("ahuel"));
+    }
+    else
+        ui->labelIsRunning->setText(QString("pizdec"));
+
+    Py_Finalize();
+
+}

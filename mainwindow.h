@@ -33,6 +33,8 @@ public:
 private slots:
     void on_search_clicked();
 
+    void on_buttonRunPy_clicked();
+
 private:
     Ui::MainWindow *ui;
      QSqlDatabase db;
