@@ -81,28 +81,26 @@ void MainWindow::on_search_clicked()
 // ///////////////////////////////////////////////////////////////////////////////////////////////
 
         QSqlQuery qry;
-        QString query = "SELECT r.name, r.Category, r.Link "
+        QString query = "SELECT r.name, r.Category "
                         "FROM Recipes r "
                         "JOIN Composition c ON r.id = c.id_recipe "
                          "JOIN Ingredients i ON c.id_ingredient = i.id "
                         "WHERE i.name IN (" + LowSearch + ")"
                         "GROUP BY r.name "
-                        "HAVING COUNT(DISTINCT c.id_ingredient) = " +  QString::number((int)words.size());
-
-    // qDebug() << query;
+                        "HAVING COUNT(DISTINCT c.id_ingredient) = " + QString::number((int)words.size());
 
         if (qry.exec(query))//exec() возвращает булево значение, которое указывает, успешно ли выполнен запрос.
         {
             model->setQuery(query);
             ui->tableView->setModel(model);
+
            model->setHeaderData(0,Qt::Horizontal,"Recipes", Qt::DisplayRole);//изменили название столбца
-          ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//выравнивание по ширине виджета
 
+           ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//выравнивание по ширине виджета
+          // ui->tableView->horizontalHeader()->setSectionResizeMode(0,);
           ui->tableView-> setSelectionBehavior(QAbstractItemView::SelectRows);//выдел€етс€ вс€ строка, а не конкретна€ €чейка
-          // ui->tableView->setShowGrid(false); // cкрывает сетку(«ј„≈ћ? а € не знаю)
 
-         // ui - setSelectionBehavior(): ”станавливает поведение выделени€ €чеек в таблице.
-          // - setSelectionMode(): ”станавливает режим выбора €чеек в таблице.
+          // ui->tableView->setShowGrid(false); // cкрывает сетку(«ј„≈ћ? а € не знаю)
 
           //в дальнейшем при нажатии на рецепт должно вылезать
            //новое окно с количеством необходимых продуктов и список продуктов которых надо приобрести
@@ -118,5 +116,7 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
            QString second = index.sibling(index.row(), 1).data().toString();
 
            qDebug() << first << " -> " << second;
+
+
     }
 }
