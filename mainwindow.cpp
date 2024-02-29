@@ -1,5 +1,3 @@
-
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -9,8 +7,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("C:/prog/project/temp/delicious.db");
+    db.setDatabaseName("C:/Users/acer/Desktop/SQLiteDatabaseBrowserPortable/delicious.db");
 
+// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if(db.open())
     {
         //ui->statusBar->showMessage("db is open: " + db.databaseName());//запись о удачном подключении к базе данных
@@ -20,7 +19,8 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     else
         ui->statusBar->showMessage("db have error: "+ db.lastError().databaseText());
-}
+}     //   ОБРАБОТКА СОБЫТИЙ УДАЧНОГО И НЕУДАЧНОГО ПОДКЛЮЧЕНИЯ К БД
+// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 MainWindow::~MainWindow()
 {
@@ -30,13 +30,12 @@ MainWindow::~MainWindow()
 void MainWindow::on_search_clicked()
 {
     setlocale(LC_ALL, "RUS");
-
-    QString search;
+      QString search;
         search = ui->lineEdit->text();
 
         search.insert(0,"'");
         search.append("'");
-
+       //КАВЫЧКИ В НАЧАЛИ И КОНЦЕ ЗАПРОСА
 
          QString LowSearch = search.toLower();//поисковая строка в нижнем регистре
          // теперь нужно проставить заглавные буквы в словах))
@@ -50,10 +49,7 @@ void MainWindow::on_search_clicked()
                   } else if (LowSearch[i] == ' ') {
                       makeUpper = true;
                   }
-              }// первые буквы становятся заглавными
-
-             // qDebug() << LowSearch;
-
+              }// ПЕРВЫЕ БУКВЫ СТАНОВЯТСЯ ЗАГЛАВНЫМИ
 
               for(int i = 0; i < LowSearch.length(); i++)//Просставляем ковычки в нужных местах
               {
@@ -64,11 +60,9 @@ void MainWindow::on_search_clicked()
                      i += 2;
                   }
 
-              }//Кавычки для Sqlite запроса
+              }//КАВЫЧКИ МЕЖДУ СЛОВ В ЗАПРОСЕ
 
              //qDebug() << LowSearch;
-
-
 
         QSqlQueryModel *model = new QSqlQueryModel;//создали модель для отображения заспроса
 
@@ -83,7 +77,7 @@ void MainWindow::on_search_clicked()
                 end = search.toStdString().length();
             words.push_back(LowSearch.toStdString().substr(start, end - start));
             start = LowSearch.toStdString().find_first_not_of(separators, end + 1);
-        }//подсчет слов в строке запроса
+        }//ПОДСЧЕТ СЛОВ В СТРОКЕ
 // ///////////////////////////////////////////////////////////////////////////////////////////////
 
         QSqlQuery qry;
@@ -97,13 +91,18 @@ void MainWindow::on_search_clicked()
 
     // qDebug() << query;
 
-        if (qry.exec(query))
+        if (qry.exec(query))//exec() возвращает булево значение, которое указывает, успешно ли выполнен запрос.
         {
             model->setQuery(query);
             ui->tableView->setModel(model);
            model->setHeaderData(0,Qt::Horizontal,"Recipes", Qt::DisplayRole);//изменили название столбца
-           ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//выравнивание по ширине виджета
-           //ui->tableView->setShowGrid(false); // cкрывает сетку
+          ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//выравнивание по ширине виджета
+
+          ui->tableView-> setSelectionBehavior(QAbstractItemView::SelectRows);//выделяется вся строка, а не конкретная ячейка
+          // ui->tableView->setShowGrid(false); // cкрывает сетку(ЗАЧЕМ? а я не знаю)
+
+         // ui - setSelectionBehavior(): Устанавливает поведение выделения ячеек в таблице.
+          // - setSelectionMode(): Устанавливает режим выбора ячеек в таблице.
 
           //в дальнейшем при нажатии на рецепт должно вылезать
            //новое окно с количеством необходимых продуктов и список продуктов которых надо приобрести
@@ -111,3 +110,13 @@ void MainWindow::on_search_clicked()
         else return;
     }
 
+
+void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
+{
+    if (index.isValid()) {
+           QString first = index.sibling(index.row(), 0).data().toString(); // Первая колонка
+           QString second = index.sibling(index.row(), 1).data().toString();
+
+           qDebug() << first << " -> " << second;
+    }
+}

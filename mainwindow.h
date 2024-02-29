@@ -14,6 +14,7 @@
  #include <QFrame>
 
 
+
 using namespace std;
 
 namespace Ui {
@@ -32,6 +33,10 @@ public:
 
 private slots:
     void on_search_clicked();
+
+
+
+    void on_tableView_doubleClicked(const QModelIndex &index);
 
 private:
     Ui::MainWindow *ui;
