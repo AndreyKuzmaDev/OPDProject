@@ -13,8 +13,6 @@
 #include <QDebug>
  #include <QFrame>
 
-
-
 using namespace std;
 
 namespace Ui {

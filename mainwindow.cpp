@@ -96,10 +96,17 @@ void MainWindow::on_search_clicked()
 
            model->setHeaderData(0,Qt::Horizontal,"Recipes", Qt::DisplayRole);//изменили название столбца
 
-           ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//выравнивание по ширине виджета
-          // ui->tableView->horizontalHeader()->setSectionResizeMode(0,);
-          ui->tableView-> setSelectionBehavior(QAbstractItemView::SelectRows);//выдел€етс€ вс€ строка, а не конкретна€ €чейка
 
+          // ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//выравнивание по ширине виджета
+           ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed); // ”становка режима изменени€ размеров вручную
+           int totalWidth = ui->tableView->width(); // ќбща€ ширина TableView
+           int firstColumnWidth = totalWidth * 0.55;
+           int secondColumnWidth = totalWidth * 0.45;
+           ui->tableView->setColumnWidth(0, firstColumnWidth); // первый столбец
+           ui->tableView->setColumnWidth(1, secondColumnWidth); // второй столбец
+
+          ui->tableView-> setSelectionBehavior(QAbstractItemView::SelectRows);//выдел€етс€ вс€ строка, а не конкретна€ €чейка
+          ui->tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//отключаем scroll влево/вправо
           // ui->tableView->setShowGrid(false); // cкрывает сетку(«ј„≈ћ? а € не знаю)
 
           //в дальнейшем при нажатии на рецепт должно вылезать
