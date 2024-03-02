@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+  #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -64,7 +64,7 @@ void MainWindow::on_search_clicked()
 
              //qDebug() << LowSearch;
 
-        QSqlQueryModel *model = new QSqlQueryModel;//создали модель для отображения заспроса
+        model = new QSqlQueryModel;//создали модель для отображения заспроса
 
 // /////////////////////////////////////////////////////////////////////////////////////////////
         const string separators{ " ,;:.\"!?'*\n" };
@@ -107,10 +107,7 @@ void MainWindow::on_search_clicked()
 
           ui->tableView-> setSelectionBehavior(QAbstractItemView::SelectRows);//выделяется вся строка, а не конкретная ячейка
           ui->tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//отключаем scroll влево/вправо
-          // ui->tableView->setShowGrid(false); // cкрывает сетку(ЗАЧЕМ? а я не знаю)
-
-          //в дальнейшем при нажатии на рецепт должно вылезать
-           //новое окно с количеством необходимых продуктов и список продуктов которых надо приобрести
+          // ui->tableView->setShowGrid(false); // cкрывает сетку(ЗАЧЕМ? а я не знаю
         }
         else return;
     }
@@ -122,8 +119,40 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
            QString first = index.sibling(index.row(), 0).data().toString(); // Первая колонка
            QString second = index.sibling(index.row(), 1).data().toString();
 
-           qDebug() << first << " -> " << second;
+           first.insert(0,"'");
+           first.append("'");
+
+           QSqlQuery qr;
+           QString quer = "SELECT i.Name "
+                           "FROM Recipes r "
+                           "JOIN Composition c ON r.id = c.id_recipe "
+                           "JOIN Ingredients i ON c.id_ingredient = i.id "
+                           "WHERE r.name IN (" + first + ")";
+
+
+          QSqlQueryModel *model2 = new QSqlQueryModel;//создали модель для отображения заспроса
+          ui->textBrowser->setFont(QFont("Verdana", 12));//e
+
+           if (qr.exec(quer))
+           {
+             model2->setQuery(quer);
+             ui->tableView->setModel(model2);
+
+               QString result = "List ingredients:\n";
+               ui->textBrowser->setText(result);
+                result.clear();
+
+                for (int row = 0; row < model2->rowCount(); ++row)
+                {
+                    QModelIndex index = model2->index(row, 0);
+                    result += model2->data(index).toString() + "\n";
+                }
+
+                ui->textBrowser->append(result);
+                 ui->tableView->setModel(model);
+           }
 
 
     }
+
 }

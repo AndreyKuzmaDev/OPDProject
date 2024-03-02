@@ -12,6 +12,7 @@
 #include <windows.h>
 #include <QDebug>
  #include <QFrame>
+#include <QPoint>
 
 using namespace std;
 
@@ -34,6 +35,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
      QSqlDatabase db;
+     QSqlQueryModel *model;
+
 
 };
 
