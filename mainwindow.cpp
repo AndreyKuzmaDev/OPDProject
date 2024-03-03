@@ -1,4 +1,4 @@
-#include <Python.h>
+#include <QProcess>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -116,5 +116,12 @@ void MainWindow::on_search_clicked()
 
 void MainWindow::on_buttonRunPy_clicked()
 {
-    std::cout << "TEMP" << std::endl;
+    std::cout << "Started" << std::endl;
+
+    QString program("C:\\prog\\project\\temp\\scripts\\data_transfer.exe");
+    QStringList parameters;
+    parameters << "3001" << "3010";
+    std::cout << QProcess::execute(program, parameters);
+
+    std::cout << "Finished" << std::endl;
 }

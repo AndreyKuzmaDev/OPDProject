@@ -11,7 +11,7 @@
 #include <locale.h>
 #include <windows.h>
 #include <QDebug>
- #include <QFrame>
+#include <QFrame>
 
 
 using namespace std;
