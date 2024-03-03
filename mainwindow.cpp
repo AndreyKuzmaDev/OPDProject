@@ -116,25 +116,5 @@ void MainWindow::on_search_clicked()
 
 void MainWindow::on_buttonRunPy_clicked()
 {
-    Py_Initialize();
-
-    PyObject *pName, *pModule, *pDict, *pFunc, *pValue;
-
-    pName = PyUnicode_FromString("scripts/data transfer.py");
-
-    pModule = PyImport_Import(pName);
-
-    pDict = PyModule_GetDict(pModule);
-
-    pFunc = PyDict_GetItemString(pDict, "run");
-
-    if (PyCallable_Check(pFunc))
-    {
-        ui->labelIsRunning->setText(QString("ahuel"));
-    }
-    else
-        ui->labelIsRunning->setText(QString("pizdec"));
-
-    Py_Finalize();
-
+    std::cout << "TEMP" << std::endl;
 }
