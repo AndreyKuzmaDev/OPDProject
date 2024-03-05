@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1200</width>
-    <height>700</height>
+    <height>800</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,82 +25,13 @@
   <property name="maximumSize">
    <size>
     <width>1200</width>
-    <height>700</height>
+    <height>800</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Мой холодильник</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>30</y>
-      <width>861</width>
-      <height>471</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QPushButton" name="search">
-         <property name="text">
-          <string>Поиск</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineEdit"/>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QTableView" name="tableView"/>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>510</y>
-      <width>861</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Далее</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="buttonRunPy">
-    <property name="geometry">
-     <rect>
-      <x>950</x>
-      <y>30</y>
-      <width>93</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Run script</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelIsRunning">
-    <property name="geometry">
-     <rect>
-      <x>1060</x>
-      <y>30</y>
-      <width>55</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Inactive</string>
-    </property>
-   </widget>
-
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -221,6 +152,14 @@
      <height>26</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Файл</string>
+    </property>
+    <addaction name="actionUpdateDB"/>
+    <addaction name="separator"/>
+   </widget>
+   <addaction name="menu"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -231,6 +170,11 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionUpdateDB">
+   <property name="text">
+    <string>Обновить базу данных</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

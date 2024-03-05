@@ -1,4 +1,3 @@
-
 #include <QProcess>
 
 #include "mainwindow.h"
@@ -10,14 +9,14 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("C:/Users/acer/Desktop/SQLiteDatabaseBrowserPortable/delicious.db");
+    db.setDatabaseName("C:/prog/project/temp/scripts/delicious.db");
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if(db.open())
     {
-        //ui->statusBar->showMessage("db is open: " + db.databaseName());//çàïèñü î óäà÷íîì ïîäêëþ÷åíèè ê áàçå äàííûõ
+        //ui->statusBar->showMessage("db is open: " + db.databaseName());//ç� ïèñü î óä� ÷íîì ïîäêëþ÷åíèè ê á� çå ä� ííûõ
 
-              // model = new QSqlTableModel(this,db);// âûâîä áàçû äàííûõ íà ýêðàí
+              // model = new QSqlTableModel(this,db);// âûâîä á� çû ä� ííûõ í�  ýêð� í
               //  ui->tableView->setModel(model);
     }
     else
@@ -42,8 +41,8 @@ void MainWindow::on_search_clicked()
         search.append("'");
        //ÊÀÂÛ×ÊÈ Â ÍÀ×ÀËÈ È ÊÎÍÖÅ ÇÀÏÐÎÑÀ
 
-         QString LowSearch = search.toLower();//ïîèñêîâàÿ ñòðîêà â íèæíåì ðåãèñòðå
-         // òåïåðü íóæíî ïðîñòàâèòü çàãëàâíûå áóêâû â ñëîâàõ))
+         QString LowSearch = search.toLower();//ïîèñêîâ� ÿ ñòðîê�  â íèæíåì ðåãèñòðå
+         // òåïåðü íóæíî ïðîñò� âèòü ç� ãë� âíûå áóêâû â ñëîâ� õ))
 
           bool makeUpper = true;
 
@@ -56,7 +55,7 @@ void MainWindow::on_search_clicked()
                   }
               }// ÏÅÐÂÛÅ ÁÓÊÂÛ ÑÒÀÍÎÂßÒÑß ÇÀÃËÀÂÍÛÌÈ
 
-              for(int i = 0; i < LowSearch.length(); i++)//Ïðîññòàâëÿåì êîâû÷êè â íóæíûõ ìåñòàõ
+              for(int i = 0; i < LowSearch.length(); i++)//Ïðîññò� âëÿåì êîâû÷êè â íóæíûõ ìåñò� õ
               {
                   if(LowSearch[i]==',')
                   {
@@ -69,11 +68,11 @@ void MainWindow::on_search_clicked()
 
              //qDebug() << LowSearch;
 
-        model = new QSqlQueryModel;//ñîçäàëè ìîäåëü äëÿ îòîáðàæåíèÿ çàñïðîñà
+        model = new QSqlQueryModel;//ñîçä� ëè ìîäåëü äëÿ îòîáð� æåíèÿ ç� ñïðîñ� 
 
 // /////////////////////////////////////////////////////////////////////////////////////////////
         const string separators{ " ,;:.\"!?'*\n" };
-        vector <string> words; // âåêòîð äëÿ õðàíåíèÿ ñëîâ
+        vector <string> words; // âåêòîð äëÿ õð� íåíèÿ ñëîâ
         size_t start { LowSearch.toStdString().find_first_not_of(separators) };
         while (start != string::npos)
         {
@@ -94,46 +93,47 @@ void MainWindow::on_search_clicked()
                         "GROUP BY r.name "
                         "HAVING COUNT(DISTINCT c.id_ingredient) = " + QString::number((int)words.size());
 
-        if (qry.exec(query))//exec() âîçâðàùàåò áóëåâî çíà÷åíèå, êîòîðîå óêàçûâàåò, óñïåøíî ëè âûïîëíåí çàïðîñ.
+        if (qry.exec(query))//exec() âîçâð� ù� åò áóëåâî çí� ÷åíèå, êîòîðîå óê� çûâ� åò, óñïåøíî ëè âûïîëíåí ç� ïðîñ.
         {
             model->setQuery(query);
             ui->tableView->setModel(model);
 
-           model->setHeaderData(0,Qt::Horizontal,"Recipes", Qt::DisplayRole);//èçìåíèëè íàçâàíèå ñòîëáöà
+           model->setHeaderData(0,Qt::Horizontal,"Recipes", Qt::DisplayRole);//èçìåíèëè í� çâ� íèå ñòîëáö� 
 
 
-          // ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//âûðàâíèâàíèå ïî øèðèíå âèäæåòà
-           ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed); // Óñòàíîâêà ðåæèìà èçìåíåíèÿ ðàçìåðîâ âðó÷íóþ
-           int totalWidth = ui->tableView->width(); // Îáùàÿ øèðèíà TableView
+          // ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//âûð� âíèâ� íèå ïî øèðèíå âèäæåò� 
+           ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed); // Óñò� íîâê�  ðåæèì�  èçìåíåíèÿ ð� çìåðîâ âðó÷íóþ
+           int totalWidth = ui->tableView->width(); // Îáù� ÿ øèðèí�  TableView
            int firstColumnWidth = totalWidth * 0.55;
            int secondColumnWidth = totalWidth * 0.45;
            ui->tableView->setColumnWidth(0, firstColumnWidth); // ïåðâûé ñòîëáåö
            ui->tableView->setColumnWidth(1, secondColumnWidth); // âòîðîé ñòîëáåö
 
-          ui->tableView-> setSelectionBehavior(QAbstractItemView::SelectRows);//âûäåëÿåòñÿ âñÿ ñòðîêà, à íå êîíêðåòíàÿ ÿ÷åéêà
-          ui->tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//îòêëþ÷àåì scroll âëåâî/âïðàâî
-          // ui->tableView->setShowGrid(false); // cêðûâàåò ñåòêó(ÇÀ×ÅÌ? à ÿ íå çíàþ
+          ui->tableView-> setSelectionBehavior(QAbstractItemView::SelectRows);//âûäåëÿåòñÿ âñÿ ñòðîê� , �  íå êîíêðåòí� ÿ ÿ÷åéê� 
+          ui->tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//îòêëþ÷� åì scroll âëåâî/âïð� âî
+          // ui->tableView->setShowGrid(false); // cêðûâ� åò ñåòêó(ÇÀ×ÅÌ? �  ÿ íå çí� þ
         }
         else return;
     }
 
 
-
-void MainWindow::on_buttonRunPy_clicked()
+void MainWindow::runScript(int beg, int end)
 {
     std::cout << "Started" << std::endl;
 
     QString program("C:\\prog\\project\\temp\\scripts\\data_transfer.exe");
     QStringList parameters;
-    parameters << "3001" << "3010";
+    parameters << QString::number(beg) << QString::number(end);
     std::cout << QProcess::execute(program, parameters);
 
     std::cout << "Finished" << std::endl;
+}
+
 
 void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
 {
     if (index.isValid()) {
-           QString first = index.sibling(index.row(), 0).data().toString(); // Ïåðâàÿ êîëîíêà
+           QString first = index.sibling(index.row(), 0).data().toString(); // Ïåðâ� ÿ êîëîíê� 
            QString second = index.sibling(index.row(), 1).data().toString();
 
            first.insert(0,"'");
@@ -147,7 +147,7 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
                            "WHERE r.name IN (" + first + ")";
 
 
-          QSqlQueryModel *model2 = new QSqlQueryModel;//ñîçäàëè ìîäåëü äëÿ îòîáðàæåíèÿ çàñïðîñà
+          QSqlQueryModel *model2 = new QSqlQueryModel;//ñîçä� ëè ìîäåëü äëÿ îòîáð� æåíèÿ ç� ñïðîñ� 
           ui->textBrowser->setFont(QFont("Verdana", 12));//e
 
            if (qr.exec(quer))
@@ -173,4 +173,11 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
     }
 
 
+}
+
+void MainWindow::on_actionUpdateDB_triggered()
+{
+    std::cout<< "works" << std::endl;
+
+    runScript(3001, 3010);
 }
