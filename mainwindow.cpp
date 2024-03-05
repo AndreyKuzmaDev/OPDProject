@@ -1,3 +1,4 @@
+
 #include <QProcess>
 
 #include "mainwindow.h"
@@ -9,18 +10,20 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("C:/prog/project/temp/delicious.db");
+    db.setDatabaseName("C:/Users/acer/Desktop/SQLiteDatabaseBrowserPortable/delicious.db");
 
+// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if(db.open())
     {
-        //ui->statusBar->showMessage("db is open: " + db.databaseName());//запись о удачном подключении к базе данных
+        //ui->statusBar->showMessage("db is open: " + db.databaseName());//Г§Г ГЇГЁГ±Гј Г® ГіГ¤Г Г·Г­Г®Г¬ ГЇГ®Г¤ГЄГ«ГѕГ·ГҐГ­ГЁГЁ ГЄ ГЎГ Г§ГҐ Г¤Г Г­Г­Г»Гµ
 
-              // model = new QSqlTableModel(this,db);// вывод базы данных на экран
+              // model = new QSqlTableModel(this,db);// ГўГ»ГўГ®Г¤ ГЎГ Г§Г» Г¤Г Г­Г­Г»Гµ Г­Г  ГЅГЄГ°Г Г­
               //  ui->tableView->setModel(model);
     }
     else
         ui->statusBar->showMessage("db have error: "+ db.lastError().databaseText());
-}
+}     //   ГЋГЃГђГЂГЃГЋГ’ГЉГЂ Г‘ГЋГЃГ›Г’Г€Г‰ Г“Г„ГЂГ—ГЌГЋГѓГЋ Г€ ГЌГ…Г“Г„ГЂГ—ГЌГЋГѓГЋ ГЏГЋГ„ГЉГ‹ГћГ—Г…ГЌГ€Гџ ГЉ ГЃГ„
+// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 MainWindow::~MainWindow()
 {
@@ -31,17 +34,16 @@ void MainWindow::on_search_clicked()
 {
     setlocale(LC_ALL, "RUS");
 
+      QString search;
 
-
-    QString search;
         search = ui->lineEdit->text();
 
         search.insert(0,"'");
         search.append("'");
+       //ГЉГЂГ‚Г›Г—ГЉГ€ Г‚ ГЌГЂГ—ГЂГ‹Г€ Г€ ГЉГЋГЌГ–Г… Г‡ГЂГЏГђГЋГ‘ГЂ
 
-
-         QString LowSearch = search.toLower();//поисковая строка в нижнем регистре
-         // теперь нужно проставить заглавные буквы в словах))
+         QString LowSearch = search.toLower();//ГЇГ®ГЁГ±ГЄГ®ГўГ Гї Г±ГІГ°Г®ГЄГ  Гў Г­ГЁГ¦Г­ГҐГ¬ Г°ГҐГЈГЁГ±ГІГ°ГҐ
+         // ГІГҐГЇГҐГ°Гј Г­ГіГ¦Г­Г® ГЇГ°Г®Г±ГІГ ГўГЁГІГј Г§Г ГЈГ«Г ГўГ­Г»ГҐ ГЎГіГЄГўГ» Гў Г±Г«Г®ГўГ Гµ))
 
           bool makeUpper = true;
 
@@ -52,12 +54,9 @@ void MainWindow::on_search_clicked()
                   } else if (LowSearch[i] == ' ') {
                       makeUpper = true;
                   }
-              }// первые буквы становятся заглавными
+              }// ГЏГ…ГђГ‚Г›Г… ГЃГ“ГЉГ‚Г› Г‘Г’ГЂГЌГЋГ‚ГџГ’Г‘Гџ Г‡ГЂГѓГ‹ГЂГ‚ГЌГ›ГЊГ€
 
-             // qDebug() << LowSearch;
-
-
-              for(int i = 0; i < LowSearch.length(); i++)//Просставляем ковычки в нужных местах
+              for(int i = 0; i < LowSearch.length(); i++)//ГЏГ°Г®Г±Г±ГІГ ГўГ«ГїГҐГ¬ ГЄГ®ГўГ»Г·ГЄГЁ Гў Г­ГіГ¦Г­Г»Гµ Г¬ГҐГ±ГІГ Гµ
               {
                   if(LowSearch[i]==',')
                   {
@@ -66,17 +65,15 @@ void MainWindow::on_search_clicked()
                      i += 2;
                   }
 
-              }//Кавычки для Sqlite запроса
+              }//ГЉГЂГ‚Г›Г—ГЉГ€ ГЊГ…Г†Г„Г“ Г‘Г‹ГЋГ‚ Г‚ Г‡ГЂГЏГђГЋГ‘Г…
 
              //qDebug() << LowSearch;
 
-
-
-        QSqlQueryModel *model = new QSqlQueryModel;//создали модель для отображения заспроса
+        model = new QSqlQueryModel;//Г±Г®Г§Г¤Г Г«ГЁ Г¬Г®Г¤ГҐГ«Гј Г¤Г«Гї Г®ГІГ®ГЎГ°Г Г¦ГҐГ­ГЁГї Г§Г Г±ГЇГ°Г®Г±Г 
 
 // /////////////////////////////////////////////////////////////////////////////////////////////
         const string separators{ " ,;:.\"!?'*\n" };
-        vector <string> words; // вектор для хранения слов
+        vector <string> words; // ГўГҐГЄГІГ®Г° Г¤Г«Гї ГµГ°Г Г­ГҐГ­ГЁГї Г±Г«Г®Гў
         size_t start { LowSearch.toStdString().find_first_not_of(separators) };
         while (start != string::npos)
         {
@@ -85,33 +82,41 @@ void MainWindow::on_search_clicked()
                 end = search.toStdString().length();
             words.push_back(LowSearch.toStdString().substr(start, end - start));
             start = LowSearch.toStdString().find_first_not_of(separators, end + 1);
-        }//подсчет слов в строке запроса
+        }//ГЏГЋГ„Г‘Г—Г…Г’ Г‘Г‹ГЋГ‚ Г‚ Г‘Г’ГђГЋГЉГ…
 // ///////////////////////////////////////////////////////////////////////////////////////////////
 
         QSqlQuery qry;
-        QString query = "SELECT r.name, r.Category, r.Link "
+        QString query = "SELECT r.name, r.Category "
                         "FROM Recipes r "
                         "JOIN Composition c ON r.id = c.id_recipe "
                          "JOIN Ingredients i ON c.id_ingredient = i.id "
                         "WHERE i.name IN (" + LowSearch + ")"
                         "GROUP BY r.name "
-                        "HAVING COUNT(DISTINCT c.id_ingredient) = " +  QString::number((int)words.size());
+                        "HAVING COUNT(DISTINCT c.id_ingredient) = " + QString::number((int)words.size());
 
-    // qDebug() << query;
-
-        if (qry.exec(query))
+        if (qry.exec(query))//exec() ГўГ®Г§ГўГ°Г Г№Г ГҐГІ ГЎГіГ«ГҐГўГ® Г§Г­Г Г·ГҐГ­ГЁГҐ, ГЄГ®ГІГ®Г°Г®ГҐ ГіГЄГ Г§Г»ГўГ ГҐГІ, ГіГ±ГЇГҐГёГ­Г® Г«ГЁ ГўГ»ГЇГ®Г«Г­ГҐГ­ Г§Г ГЇГ°Г®Г±.
         {
             model->setQuery(query);
             ui->tableView->setModel(model);
-           model->setHeaderData(0,Qt::Horizontal,"Recipes", Qt::DisplayRole);//изменили название столбца
-           ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//выравнивание по ширине виджета
-           //ui->tableView->setShowGrid(false); // cкрывает сетку
 
-          //в дальнейшем при нажатии на рецепт должно вылезать
-           //новое окно с количеством необходимых продуктов и список продуктов которых надо приобрести
+           model->setHeaderData(0,Qt::Horizontal,"Recipes", Qt::DisplayRole);//ГЁГ§Г¬ГҐГ­ГЁГ«ГЁ Г­Г Г§ГўГ Г­ГЁГҐ Г±ГІГ®Г«ГЎГ¶Г 
+
+
+          // ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//ГўГ»Г°Г ГўГ­ГЁГўГ Г­ГЁГҐ ГЇГ® ГёГЁГ°ГЁГ­ГҐ ГўГЁГ¤Г¦ГҐГІГ 
+           ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed); // Г“Г±ГІГ Г­Г®ГўГЄГ  Г°ГҐГ¦ГЁГ¬Г  ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГї Г°Г Г§Г¬ГҐГ°Г®Гў ГўГ°ГіГ·Г­ГіГѕ
+           int totalWidth = ui->tableView->width(); // ГЋГЎГ№Г Гї ГёГЁГ°ГЁГ­Г  TableView
+           int firstColumnWidth = totalWidth * 0.55;
+           int secondColumnWidth = totalWidth * 0.45;
+           ui->tableView->setColumnWidth(0, firstColumnWidth); // ГЇГҐГ°ГўГ»Г© Г±ГІГ®Г«ГЎГҐГ¶
+           ui->tableView->setColumnWidth(1, secondColumnWidth); // ГўГІГ®Г°Г®Г© Г±ГІГ®Г«ГЎГҐГ¶
+
+          ui->tableView-> setSelectionBehavior(QAbstractItemView::SelectRows);//ГўГ»Г¤ГҐГ«ГїГҐГІГ±Гї ГўГ±Гї Г±ГІГ°Г®ГЄГ , Г  Г­ГҐ ГЄГ®Г­ГЄГ°ГҐГІГ­Г Гї ГїГ·ГҐГ©ГЄГ 
+          ui->tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//Г®ГІГЄГ«ГѕГ·Г ГҐГ¬ scroll ГўГ«ГҐГўГ®/ГўГЇГ°Г ГўГ®
+          // ui->tableView->setShowGrid(false); // cГЄГ°Г»ГўГ ГҐГІ Г±ГҐГІГЄГі(Г‡ГЂГ—Г…ГЊ? Г  Гї Г­ГҐ Г§Г­Г Гѕ
         }
         else return;
     }
+
 
 
 void MainWindow::on_buttonRunPy_clicked()
@@ -124,4 +129,48 @@ void MainWindow::on_buttonRunPy_clicked()
     std::cout << QProcess::execute(program, parameters);
 
     std::cout << "Finished" << std::endl;
+
+void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
+{
+    if (index.isValid()) {
+           QString first = index.sibling(index.row(), 0).data().toString(); // ГЏГҐГ°ГўГ Гї ГЄГ®Г«Г®Г­ГЄГ 
+           QString second = index.sibling(index.row(), 1).data().toString();
+
+           first.insert(0,"'");
+           first.append("'");
+
+           QSqlQuery qr;
+           QString quer = "SELECT i.Name "
+                           "FROM Recipes r "
+                           "JOIN Composition c ON r.id = c.id_recipe "
+                           "JOIN Ingredients i ON c.id_ingredient = i.id "
+                           "WHERE r.name IN (" + first + ")";
+
+
+          QSqlQueryModel *model2 = new QSqlQueryModel;//Г±Г®Г§Г¤Г Г«ГЁ Г¬Г®Г¤ГҐГ«Гј Г¤Г«Гї Г®ГІГ®ГЎГ°Г Г¦ГҐГ­ГЁГї Г§Г Г±ГЇГ°Г®Г±Г 
+          ui->textBrowser->setFont(QFont("Verdana", 12));//e
+
+           if (qr.exec(quer))
+           {
+             model2->setQuery(quer);
+             ui->tableView->setModel(model2);
+
+               QString result = "List ingredients:\n";
+               ui->textBrowser->setText(result);
+                result.clear();
+
+                for (int row = 0; row < model2->rowCount(); ++row)
+                {
+                    QModelIndex index = model2->index(row, 0);
+                    result += model2->data(index).toString() + "\n";
+                }
+
+                ui->textBrowser->append(result);
+                 ui->tableView->setModel(model);
+           }
+
+
+    }
+
+
 }
