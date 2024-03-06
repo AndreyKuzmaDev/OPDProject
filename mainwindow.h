@@ -26,7 +26,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    void runScript(int beg, int end);
+    void runScript(QStringList param);
 
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();

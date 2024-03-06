@@ -1,7 +1,11 @@
 #include <QProcess>
+#include <QInputDialog>
+#include <QDebug>
+#include <QDir>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -117,16 +121,14 @@ void MainWindow::on_search_clicked()
     }
 
 
-void MainWindow::runScript(int beg, int end)
+void MainWindow::runScript(QStringList param)
 {
-    std::cout << "Started" << std::endl;
+    qDebug() << "Started";
 
     QString program("C:\\prog\\project\\temp\\scripts\\data_transfer.exe");
-    QStringList parameters;
-    parameters << QString::number(beg) << QString::number(end);
-    std::cout << QProcess::execute(program, parameters);
+    std::cout << QProcess::execute(program, param);
 
-    std::cout << "Finished" << std::endl;
+    qDebug() << "Finished";
 }
 
 
@@ -177,7 +179,10 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
 
 void MainWindow::on_actionUpdateDB_triggered()
 {
-    std::cout<< "works" << std::endl;
+    bool ok;
+    QStringList param = QInputDialog::getText(this, QString("Parameters"), QString("Enter parameters:"), QLineEdit::Normal,
+                                              "", &ok).split(' ');
 
-    runScript(3001, 3010);
+    if (ok && !param[0].isEmpty())
+        runScript(param);
 }
