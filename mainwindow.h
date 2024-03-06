@@ -13,6 +13,7 @@
 #include <QDebug>
 #include <QFrame>
 #include <QPoint>
+#include <QThread>
 
 
 using namespace std;
@@ -24,12 +25,14 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+    QThread workerThread;
 
 public:
-    void runScript(QStringList param);
-
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+public slots:
+    void DBUpdateDone();
 
 private slots:
     void on_search_clicked();
@@ -37,10 +40,16 @@ private slots:
 
     void on_actionUpdateDB_triggered();
 
+signals:
+    void doUpdate(const QStringList &params);
+
 private:
     Ui::MainWindow *ui;
      QSqlDatabase db;
      QSqlQueryModel *model;
+
+
+     bool dbReady;
 
 
 };

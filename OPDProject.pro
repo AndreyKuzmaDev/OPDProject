@@ -27,15 +27,13 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     methods.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    methods.cpp
+    script.cpp
 
 HEADERS += \
         mainwindow.h \
     methods.h \
-    mainwindow.h \
-    methods.h
+    methods.h \
+    script.h
 
 FORMS += \
         mainwindow.ui

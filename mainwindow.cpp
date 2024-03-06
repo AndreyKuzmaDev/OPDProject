@@ -5,12 +5,23 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "script.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    dbReady = true;
+
+    Script *updater = new Script;
+    updater->moveToThread(&workerThread);
+
+    connect(&workerThread, &QThread::finished, updater, &QObject::deleteLater);
+    connect(this, &MainWindow::doUpdate, updater, &Script::updateDB);
+    connect(updater, &Script::DBUpdated, this, &MainWindow::DBUpdateDone);
+    workerThread.start();
+
     ui->setupUi(this);
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("C:/prog/project/temp/scripts/delicious.db");
@@ -36,6 +47,12 @@ MainWindow::~MainWindow()
 void MainWindow::on_search_clicked()
 {
     setlocale(LC_ALL, "RUS");
+
+    if (!dbReady)
+    {
+        qDebug() << "DB is currently updating, pls wait";
+        return;
+    }
 
       QString search;
 
@@ -121,17 +138,6 @@ void MainWindow::on_search_clicked()
     }
 
 
-void MainWindow::runScript(QStringList param)
-{
-    qDebug() << "Started";
-
-    QString program("C:\\prog\\project\\temp\\scripts\\data_transfer.exe");
-    std::cout << QProcess::execute(program, param);
-
-    qDebug() << "Finished";
-}
-
-
 void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
 {
     if (index.isValid()) {
@@ -180,9 +186,18 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
 void MainWindow::on_actionUpdateDB_triggered()
 {
     bool ok;
-    QStringList param = QInputDialog::getText(this, QString("Parameters"), QString("Enter parameters:"), QLineEdit::Normal,
+    const QStringList param = QInputDialog::getText(this, QString("Parameters"), QString("Enter parameters:"), QLineEdit::Normal,
                                               "", &ok).split(' ');
 
     if (ok && !param[0].isEmpty())
-        runScript(param);
+    {
+        dbReady = false;
+        emit doUpdate(param);
+    }
 }
+
+void MainWindow::DBUpdateDone()
+{
+    dbReady = true;
+}
+
