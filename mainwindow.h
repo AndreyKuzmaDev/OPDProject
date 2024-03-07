@@ -45,11 +45,11 @@ signals:
 
 private:
     Ui::MainWindow *ui;
-     QSqlDatabase db;
-     QSqlQueryModel *model;
+    QSqlDatabase db;
+    QSqlQueryModel *model;
 
 
-     bool dbReady;
+    bool dbReady;
 
 
 };
