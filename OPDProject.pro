@@ -26,13 +26,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    methods.cpp
+    methods.cpp \
+    script.cpp
 
 HEADERS += \
         mainwindow.h \
-    methods.h
+    methods.h \
+    methods.h \
+    script.h
 
 FORMS += \
         mainwindow.ui
 
-
+DISTFILES += \
+    scripts/data_transfer.exe \
+    scripts/delicious.db
