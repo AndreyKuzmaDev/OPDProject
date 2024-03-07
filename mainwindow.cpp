@@ -2,6 +2,7 @@
 #include <QInputDialog>
 #include <QDebug>
 #include <QDir>
+#include <QFileDialog>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -14,29 +15,32 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     dbReady = true;
 
+    qDebug() << QCoreApplication::applicationDirPath();
+
     Script *updater = new Script;
     updater->moveToThread(&workerThread);
 
     connect(&workerThread, &QThread::finished, updater, &QObject::deleteLater);
     connect(this, &MainWindow::doUpdate, updater, &Script::updateDB);
     connect(updater, &Script::DBUpdated, this, &MainWindow::DBUpdateDone);
+
     workerThread.start();
 
     ui->setupUi(this);
-    db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("C:/prog/project/temp/scripts/delicious.db");
+//    db = QSqlDatabase::addDatabase("QSQLITE");
+//    db.setDatabaseName("C:/prog/project/temp/scripts/delicious.db");
 
-// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if(db.open())
-    {
-        //ui->statusBar->showMessage("db is open: " + db.databaseName());//ç� ïèñü î óä� ÷íîì ïîäêëþ÷åíèè ê á� çå ä� ííûõ
+//// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    if(db.open())
+//    {
+//        ui->statusBar->showMessage("db is open: " + db.databaseName());//ç� ïèñü î óä� ÷íîì ïîäêëþ÷åíèè ê á� çå ä� ííûõ
 
-              // model = new QSqlTableModel(this,db);// âûâîä á� çû ä� ííûõ í�  ýêð� í
-              //  ui->tableView->setModel(model);
-    }
-    else
-        ui->statusBar->showMessage("db have error: "+ db.lastError().databaseText());
-}     //   ÎÁÐÀÁÎÒÊÀ ÑÎÁÛÒÈÉ ÓÄÀ×ÍÎÃÎ È ÍÅÓÄÀ×ÍÎÃÎ ÏÎÄÊËÞ×ÅÍÈß Ê ÁÄ
+//              // model = new QSqlTableModel(this,db);// âûâîä á� çû ä� ííûõ í�  ýêð� í
+//              //  ui->tableView->setModel(model);
+//    }
+//    else
+//        ui->statusBar->showMessage("db have error: "+ db.lastError().databaseText());
+}   //   ÎÁÐÀÁÎÒÊÀ ÑÎÁÛÒÈÉ ÓÄÀ×ÍÎÃÎ È ÍÅÓÄÀ×ÍÎÃÎ ÏÎÄÊËÞ×ÅÍÈß Ê ÁÄ
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 MainWindow::~MainWindow()
@@ -139,7 +143,7 @@ void MainWindow::on_search_clicked()
 void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
 {
     if (index.isValid()) {
-        QString first = index.sibling(index.row(), 0).data().toString(); // Ïåðâ� ÿ êîëîíê�
+        QString first = index.sibling(index.row(), 0).data().toString();
         QString second = index.sibling(index.row(), 1).data().toString();
 
         first.insert(0,"'");
@@ -153,8 +157,8 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
                        "WHERE r.name IN (" + first + ")";
 
 
-        QSqlQueryModel *model2 = new QSqlQueryModel;//ñîçä� ëè ìîäåëü äëÿ îòîáð� æåíèÿ ç� ñïðîñ�
-        ui->textBrowser->setFont(QFont("Verdana", 12));//e
+        QSqlQueryModel *model2 = new QSqlQueryModel;
+        ui->textBrowser->setFont(QFont("Verdana", 12));
 
         if (qr.exec(quer))
         {
@@ -180,8 +184,15 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
 void MainWindow::on_actionUpdateDB_triggered()
 {
     bool ok;
-    const QStringList param = QInputDialog::getText(this, QString("Parameters"), QString("Enter parameters:"), QLineEdit::Normal,
-                                              "", &ok).split(' ');
+    QStringList param;
+
+    if (db.open())
+        param << db.databaseName();
+    else
+        return;
+
+    param << QInputDialog::getText(this, QString("Parameters"), QString("Enter parameters:"), QLineEdit::Normal,
+                                   "", &ok).split(' ');
 
     if (ok && !param[0].isEmpty())
     {
@@ -195,3 +206,45 @@ void MainWindow::DBUpdateDone()
     dbReady = true;
 }
 
+
+void MainWindow::on_actionOpenDB_triggered()
+{
+    QString path = QFileDialog::getOpenFileName(this);
+
+    if (db.open())
+        db.close();
+
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(path);
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if(db.open())
+    {
+        ui->statusBar->showMessage("db is open: " + db.databaseName());
+    }
+    else
+        ui->statusBar->showMessage("db have error: "+ db.lastError().databaseText());
+}
+
+void MainWindow::on_actionCreateDB_triggered()
+{
+    bool ok;
+
+    QString path = QFileDialog::getExistingDirectory(this);
+    QString name = QInputDialog::getText(this, QString("Name"), QString("Enter new database name:"), QLineEdit::Normal,
+                                         "", &ok);
+
+    qDebug() << path + "/" + name;
+    if (!ok)
+        return;
+
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(path + name);
+
+    if(db.open())
+    {
+        ui->statusBar->showMessage("db is open: " + db.databaseName());
+    }
+    else
+        ui->statusBar->showMessage("db have error: "+ db.lastError().databaseText());
+}

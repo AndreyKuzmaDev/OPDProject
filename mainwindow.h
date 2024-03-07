@@ -40,6 +40,10 @@ private slots:
 
     void on_actionUpdateDB_triggered();
 
+    void on_actionOpenDB_triggered();
+
+    void on_actionCreateDB_triggered();
+
 signals:
     void doUpdate(const QStringList &params);
 
@@ -50,8 +54,6 @@ private:
 
 
     bool dbReady;
-
-
 };
 
 #endif // MAINWINDOW_H
