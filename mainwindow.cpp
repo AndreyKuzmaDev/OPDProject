@@ -7,6 +7,7 @@
 #include "ui_mainwindow.h"
 #include "script.h"
 
+#include <QStringList>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -24,28 +25,49 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("C:/prog/project/temp/scripts/delicious.db");
+    db.setDatabaseName("C:/Users/acer/Desktop/SQLiteDatabaseBrowserPortable/delicious.db");
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if(db.open())
     {
-        //ui->statusBar->showMessage("db is open: " + db.databaseName());//ç� ïèñü î óä� ÷íîì ïîäêëþ÷åíèè ê á� çå ä� ííûõ
+        QStringList tempik;
+        QString tmp;
+        QSqlQuery qr;
+        QString quer = "SELECT DISTINCT	Category  FROM Recipes";
 
-              // model = new QSqlTableModel(this,db);// âûâîä á� çû ä� ííûõ í�  ýêð� í
-              //  ui->tableView->setModel(model);
+        QSqlQueryModel *modeltmp = new QSqlQueryModel;
+
+        if (qr.exec(quer))
+
+        {
+             modeltmp->setQuery(quer);
+            for (int row = 0; row < modeltmp->rowCount(); ++row)
+            {
+                QModelIndex index = modeltmp->index(row, 0);
+                tmp = modeltmp->data(index).toString();
+                //qDebug() << tmp;
+                tempik << tmp;
+            }
+           //NotFillter = ui->comboBox_2->itemText(0);
+           //qDebug() << NotFillter;
+            ui->comboBox_2->addItems(tempik);
+        }
+
     }
     else
         ui->statusBar->showMessage("db have error: "+ db.lastError().databaseText());
-}     //   ÎÁÐÀÁÎÒÊÀ ÑÎÁÛÒÈÉ ÓÄÀ×ÍÎÃÎ È ÍÅÓÄÀ×ÍÎÃÎ ÏÎÄÊËÞ×ÅÍÈß Ê ÁÄ
+}
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 MainWindow::~MainWindow()
 {
+
     delete ui;
 }
 
 void MainWindow::on_search_clicked()
 {
+
     setlocale(LC_ALL, "RUS");
 
     if (!dbReady)
@@ -60,10 +82,10 @@ void MainWindow::on_search_clicked()
 
     search.insert(0,"'");
     search.append("'");
-    //ÊÀÂÛ×ÊÈ Â ÍÀ×ÀËÈ È ÊÎÍÖÅ ÇÀÏÐÎÑÀ
 
-    QString LowSearch = search.toLower();//ïîèñêîâ� ÿ ñòðîê�  â íèæíåì ðåãèñòðå
-    // òåïåðü íóæíî ïðîñò� âèòü ç� ãë� âíûå áóêâû â ñëîâ� õ))
+
+    LowSearch = search.toLower();
+
 
     bool makeUpper = true;
 
@@ -74,9 +96,9 @@ void MainWindow::on_search_clicked()
         } else if (LowSearch[i] == ' ') {
             makeUpper = true;
         }
-    }// ÏÅÐÂÛÅ ÁÓÊÂÛ ÑÒÀÍÎÂßÒÑß ÇÀÃËÀÂÍÛÌÈ
+    }
 
-    for(int i = 0; i < LowSearch.length(); i++)//Ïðîññò� âëÿåì êîâû÷êè â íóæíûõ ìåñò� õ
+    for(int i = 0; i < LowSearch.length(); i++)
     {
         if(LowSearch[i]==',')
         {
@@ -85,41 +107,59 @@ void MainWindow::on_search_clicked()
             i += 2;
         }
 
-    }//ÊÀÂÛ×ÊÈ ÌÅÆÄÓ ÑËÎÂ Â ÇÀÏÐÎÑÅ
+    }
 
     //qDebug() << LowSearch;
 
     model = new QSqlQueryModel;//ñîçä� ëè ìîäåëü äëÿ îòîáð� æåíèÿ ç� ñïðîñ�
 
+    words.clear();
 // /////////////////////////////////////////////////////////////////////////////////////////////
-    const string separators{ " ,;:.\"!?'*\n" };
-    vector <string> words; // âåêòîð äëÿ õð� íåíèÿ ñëîâ
-    size_t start { LowSearch.toStdString().find_first_not_of(separators) };
-    while (start != string::npos)
+    const QString separators = " ,;:.\"!?'*\n";
+    //QVector<QString> pap;
+    int start = LowSearch.indexOf(QRegExp("[^" + separators + "]"));
+    while (start != -1)
     {
-        size_t end = LowSearch.toStdString().find_first_of(separators, start + 1);
-        if (end == string::npos)
-            end = search.toStdString().length();
-        words.push_back(LowSearch.toStdString().substr(start, end - start));
-        start = LowSearch.toStdString().find_first_not_of(separators, end + 1);
-    }//ÏÎÄÑ×ÅÒ ÑËÎÂ Â ÑÒÐÎÊÅ
+        int end = LowSearch.indexOf(QRegExp("[" + separators + "]"), start + 1);
+        if (end == -1)
+            end = LowSearch.length();
+
+            words.push_back(LowSearch.mid(start, end - start));
+
+        start = LowSearch.indexOf(QRegExp("[^" + separators + "]"), end + 1);
+    }
 // ///////////////////////////////////////////////////////////////////////////////////////////////
 
     QSqlQuery qry;
-    QString query = "SELECT r.name, r.Category "
+     QString query;
+    if((tmp.isEmpty())||(ui->comboBox_2->currentIndex() == 0))
+    {
+    query = "SELECT r.name, r.Category "
                     "FROM Recipes r "
                     "JOIN Composition c ON r.id = c.id_recipe "
                     "JOIN Ingredients i ON c.id_ingredient = i.id "
                     "WHERE i.name IN (" + LowSearch + ")"
                     "GROUP BY r.name "
                     "HAVING COUNT(DISTINCT c.id_ingredient) = " + QString::number((int)words.size());
+    }
+
+    else
+    {
+        query = "SELECT r.name, r.Category "
+                        "FROM Recipes r "
+                        "JOIN Composition c ON r.id = c.id_recipe "
+                        "JOIN Ingredients i ON c.id_ingredient = i.id "
+                        "WHERE i.name IN (" + LowSearch + ")"
+                        "AND  r.Category = "+ tmp +" "
+                        "GROUP BY r.name "
+                        "HAVING COUNT(DISTINCT c.id_ingredient) = " + QString::number((int)words.size());
+    }
 
     if (qry.exec(query))//exec() âîçâð� ù� åò áóëåâî çí� ÷åíèå, êîòîðîå óê� çûâ� åò, óñïåøíî ëè âûïîëíåí ç� ïðîñ.
     {
         model->setQuery(query);
         ui->tableView->setModel(model);
         model->setHeaderData(0,Qt::Horizontal,"Recipes", Qt::DisplayRole);//èçìåíèëè í� çâ� íèå ñòîëáö�
-
 
         // ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//âûð� âíèâ� íèå ïî øèðèíå âèäæåò�
         ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed); // Óñò� íîâê�  ðåæèì�  èçìåíåíèÿ ð� çìåðîâ âðó÷íóþ
@@ -140,7 +180,7 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
 {
     if (index.isValid()) {
         QString first = index.sibling(index.row(), 0).data().toString(); // Ïåðâ� ÿ êîëîíê�
-        QString second = index.sibling(index.row(), 1).data().toString();
+        //QString second = index.sibling(index.row(), 1).data().toString();
 
         first.insert(0,"'");
         first.append("'");
@@ -152,30 +192,38 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
                        "JOIN Ingredients i ON c.id_ingredient = i.id "
                        "WHERE r.name IN (" + first + ")";
 
-
         QSqlQueryModel *model2 = new QSqlQueryModel;//ñîçä� ëè ìîäåëü äëÿ îòîáð� æåíèÿ ç� ñïðîñ�
         ui->textBrowser->setFont(QFont("Verdana", 12));//e
+
 
         if (qr.exec(quer))
         {
             model2->setQuery(quer);
-            ui->tableView->setModel(model2);
+           // ui->tableView->setModel(model2);
 
-            QString result = "List ingredients:\n";
+            QString result = "\t\t      ingredients \n";
             ui->textBrowser->setText(result);
             result.clear();
 
             for (int row = 0; row < model2->rowCount(); ++row)
             {
                 QModelIndex index = model2->index(row, 0);
-                result += model2->data(index).toString() + "\n";
+                result = model2->data(index).toString();
+                for(QString i : words)
+                {
+                    if(i == result)
+
+                        result  = "<s>" + result +" </s>"; // teg s for perecherkivanie
+                }
+                ui->textBrowser->append(result);
             }
 
-            ui->textBrowser->append(result);
-            ui->tableView->setModel(model);
+            //ui->tableView->setModel(model);
         }
     }
 }
+
+
 
 void MainWindow::on_actionUpdateDB_triggered()
 {
@@ -195,3 +243,47 @@ void MainWindow::DBUpdateDone()
     dbReady = true;
 }
 
+
+void MainWindow::on_comboBox_2_activated(const QString &arg1)
+{
+
+     tmp = arg1;
+//     qDebug() << NotFillter;
+//     qDebug() << tmp;
+    tmp.insert(0,"'");
+    tmp.append("'");
+    QSqlQuery qry;
+    QString query;
+
+
+    if(ui->comboBox_2->currentIndex() == 0)//not
+    {
+        query = "SELECT r.name, r.Category "
+                        "FROM Recipes r "
+                        "JOIN Composition c ON r.id = c.id_recipe "
+                        "JOIN Ingredients i ON c.id_ingredient = i.id "
+                        "WHERE i.name IN (" + LowSearch + ")"
+                        "GROUP BY r.name "
+                        "HAVING COUNT(DISTINCT c.id_ingredient) = " + QString::number((int)words.size());
+    }
+
+   else
+    {
+        query = "SELECT r.name, r.Category "
+                        "FROM Recipes r "
+                        "JOIN Composition c ON r.id = c.id_recipe "
+                        "JOIN Ingredients i ON c.id_ingredient = i.id "
+                        "WHERE i.name IN (" + LowSearch + ")"
+                        "AND  r.Category = "+ tmp +" "
+                        "GROUP BY r.name "
+                        "HAVING COUNT(DISTINCT c.id_ingredient) = " + QString::number((int)words.size());
+    }
+
+
+   if(qry.exec(query))
+   {
+     model->setQuery(query);
+     ui->tableView->setModel(model);
+   }
+
+}
