@@ -2,6 +2,7 @@
 #include <QInputDialog>
 #include <QDebug>
 #include <QDir>
+#include <QFileDialog>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -15,15 +16,19 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     dbReady = true;
 
+    qDebug() << QCoreApplication::applicationDirPath();
+
     Script *updater = new Script;
     updater->moveToThread(&workerThread);
 
     connect(&workerThread, &QThread::finished, updater, &QObject::deleteLater);
     connect(this, &MainWindow::doUpdate, updater, &Script::updateDB);
     connect(updater, &Script::DBUpdated, this, &MainWindow::DBUpdateDone);
+
     workerThread.start();
 
     ui->setupUi(this);
+
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("C:/Users/acer/Desktop/SQLiteDatabaseBrowserPortable/delicious.db");
 
@@ -61,7 +66,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-
+    workerThread.exit();
+    delete model;
     delete ui;
 }
 
@@ -111,7 +117,7 @@ void MainWindow::on_search_clicked()
 
     //qDebug() << LowSearch;
 
-    model = new QSqlQueryModel;//ñîçä� ëè ìîäåëü äëÿ îòîáð� æåíèÿ ç� ñïðîñ�
+    model = new QSqlQueryModel;//Ã±Ã®Ã§Ã¤Ã Ã«Ã¨ Ã¬Ã®Ã¤Ã¥Ã«Ã¼ Ã¤Ã«Ã¿ Ã®Ã²Ã®Ã¡Ã°Ã Ã¦Ã¥Ã­Ã¨Ã¿ Ã§Ã Ã±Ã¯Ã°Ã®Ã±Ã
 
     words.clear();
 // /////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,23 +161,23 @@ void MainWindow::on_search_clicked()
                         "HAVING COUNT(DISTINCT c.id_ingredient) = " + QString::number((int)words.size());
     }
 
-    if (qry.exec(query))//exec() âîçâð� ù� åò áóëåâî çí� ÷åíèå, êîòîðîå óê� çûâ� åò, óñïåøíî ëè âûïîëíåí ç� ïðîñ.
+    if (qry.exec(query))//exec() Ã¢Ã®Ã§Ã¢Ã°Ã Ã¹Ã Ã¥Ã² Ã¡Ã³Ã«Ã¥Ã¢Ã® Ã§Ã­Ã Ã·Ã¥Ã­Ã¨Ã¥, ÃªÃ®Ã²Ã®Ã°Ã®Ã¥ Ã³ÃªÃ Ã§Ã»Ã¢Ã Ã¥Ã², Ã³Ã±Ã¯Ã¥Ã¸Ã­Ã® Ã«Ã¨ Ã¢Ã»Ã¯Ã®Ã«Ã­Ã¥Ã­ Ã§Ã Ã¯Ã°Ã®Ã±.
     {
         model->setQuery(query);
         ui->tableView->setModel(model);
-        model->setHeaderData(0,Qt::Horizontal,"Recipes", Qt::DisplayRole);//èçìåíèëè í� çâ� íèå ñòîëáö�
+        model->setHeaderData(0,Qt::Horizontal,"Recipes", Qt::DisplayRole);//Ã¨Ã§Ã¬Ã¥Ã­Ã¨Ã«Ã¨ Ã­Ã Ã§Ã¢Ã Ã­Ã¨Ã¥ Ã±Ã²Ã®Ã«Ã¡Ã¶Ã
 
-        // ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//âûð� âíèâ� íèå ïî øèðèíå âèäæåò�
-        ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed); // Óñò� íîâê�  ðåæèì�  èçìåíåíèÿ ð� çìåðîâ âðó÷íóþ
-        int totalWidth = ui->tableView->width(); // Îáù� ÿ øèðèí�  TableView
+        // ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//Ã¢Ã»Ã°Ã Ã¢Ã­Ã¨Ã¢Ã Ã­Ã¨Ã¥ Ã¯Ã® Ã¸Ã¨Ã°Ã¨Ã­Ã¥ Ã¢Ã¨Ã¤Ã¦Ã¥Ã²Ã
+        ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed); // Ã“Ã±Ã²Ã Ã­Ã®Ã¢ÃªÃ  Ã°Ã¥Ã¦Ã¨Ã¬Ã  Ã¨Ã§Ã¬Ã¥Ã­Ã¥Ã­Ã¨Ã¿ Ã°Ã Ã§Ã¬Ã¥Ã°Ã®Ã¢ Ã¢Ã°Ã³Ã·Ã­Ã³Ã¾
+        int totalWidth = ui->tableView->width(); // ÃŽÃ¡Ã¹Ã Ã¿ Ã¸Ã¨Ã°Ã¨Ã­Ã  TableView
         int firstColumnWidth = totalWidth * 0.55;
         int secondColumnWidth = totalWidth * 0.45;
-        ui->tableView->setColumnWidth(0, firstColumnWidth); // ïåðâûé ñòîëáåö
-        ui->tableView->setColumnWidth(1, secondColumnWidth); // âòîðîé ñòîëáåö
+        ui->tableView->setColumnWidth(0, firstColumnWidth); // Ã¯Ã¥Ã°Ã¢Ã»Ã© Ã±Ã²Ã®Ã«Ã¡Ã¥Ã¶
+        ui->tableView->setColumnWidth(1, secondColumnWidth); // Ã¢Ã²Ã®Ã°Ã®Ã© Ã±Ã²Ã®Ã«Ã¡Ã¥Ã¶
 
-        ui->tableView-> setSelectionBehavior(QAbstractItemView::SelectRows);//âûäåëÿåòñÿ âñÿ ñòðîê� , �  íå êîíêðåòí� ÿ ÿ÷åéê�
-        ui->tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//îòêëþ÷� åì scroll âëåâî/âïð� âî
-          // ui->tableView->setShowGrid(false); // cêðûâ� åò ñåòêó(ÇÀ×ÅÌ? �  ÿ íå çí� þ
+        ui->tableView-> setSelectionBehavior(QAbstractItemView::SelectRows);//Ã¢Ã»Ã¤Ã¥Ã«Ã¿Ã¥Ã²Ã±Ã¿ Ã¢Ã±Ã¿ Ã±Ã²Ã°Ã®ÃªÃ , Ã  Ã­Ã¥ ÃªÃ®Ã­ÃªÃ°Ã¥Ã²Ã­Ã Ã¿ Ã¿Ã·Ã¥Ã©ÃªÃ
+        ui->tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//Ã®Ã²ÃªÃ«Ã¾Ã·Ã Ã¥Ã¬ scroll Ã¢Ã«Ã¥Ã¢Ã®/Ã¢Ã¯Ã°Ã Ã¢Ã®
+          // ui->tableView->setShowGrid(false); // cÃªÃ°Ã»Ã¢Ã Ã¥Ã² Ã±Ã¥Ã²ÃªÃ³(Ã‡Ã€Ã—Ã…ÃŒ? Ã  Ã¿ Ã­Ã¥ Ã§Ã­Ã Ã¾
     }
     else return;
 }
@@ -179,7 +185,7 @@ void MainWindow::on_search_clicked()
 void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
 {
     if (index.isValid()) {
-        QString first = index.sibling(index.row(), 0).data().toString(); // Ïåðâ� ÿ êîëîíê�
+        QString first = index.sibling(index.row(), 0).data().toString(); // ÃÃ¥Ã°Ã¢Ã Ã¿ ÃªÃ®Ã«Ã®Ã­ÃªÃ
         //QString second = index.sibling(index.row(), 1).data().toString();
 
         first.insert(0,"'");
@@ -192,9 +198,8 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
                        "JOIN Ingredients i ON c.id_ingredient = i.id "
                        "WHERE r.name IN (" + first + ")";
 
-        QSqlQueryModel *model2 = new QSqlQueryModel;//ñîçä� ëè ìîäåëü äëÿ îòîáð� æåíèÿ ç� ñïðîñ�
+        QSqlQueryModel *model2 = new QSqlQueryModel;//Ã±Ã®Ã§Ã¤Ã Ã«Ã¨ Ã¬Ã®Ã¤Ã¥Ã«Ã¼ Ã¤Ã«Ã¿ Ã®Ã²Ã®Ã¡Ã°Ã Ã¦Ã¥Ã­Ã¨Ã¿ Ã§Ã Ã±Ã¯Ã°Ã®Ã±Ã
         ui->textBrowser->setFont(QFont("Verdana", 12));//e
-
 
         if (qr.exec(quer))
         {
@@ -228,8 +233,15 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
 void MainWindow::on_actionUpdateDB_triggered()
 {
     bool ok;
-    const QStringList param = QInputDialog::getText(this, QString("Parameters"), QString("Enter parameters:"), QLineEdit::Normal,
-                                              "", &ok).split(' ');
+    QStringList param;
+
+    if (db.open())
+        param << db.databaseName();
+    else
+        return;
+
+    param << QInputDialog::getText(this, QString("Parameters"), QString("Enter parameters:"), QLineEdit::Normal,
+                                   "", &ok).split(' ');
 
     if (ok && !param[0].isEmpty())
     {
@@ -243,6 +255,81 @@ void MainWindow::DBUpdateDone()
     dbReady = true;
 }
 
+void MainWindow::on_actionOpenDB_triggered()
+{
+    QString path = QFileDialog::getOpenFileName(this);
+
+    if (db.open())
+        db.close();
+
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(path);
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if(db.open())
+    {
+        ui->statusBar->showMessage("db is open: " + db.databaseName());
+    }
+    else
+        ui->statusBar->showMessage("db have error: "+ db.lastError().databaseText());
+}
+
+void MainWindow::on_actionCreateDB_triggered()
+{
+    bool ok;
+
+    QString path = QFileDialog::getExistingDirectory(this);
+    QString name = QInputDialog::getText(this, QString("Name"), QString("Enter new database name:"), QLineEdit::Normal,
+                                         "", &ok);
+
+    qDebug() << path + "/" + name;
+    if (!ok)
+        return;
+
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(path + "/" + name);
+
+    if(db.open())
+    {
+        ui->statusBar->showMessage("db is open: " + db.databaseName());
+
+        QSqlQuery qr;
+        QString quer1 = "CREATE TABLE Composition ( "
+                                              "id	INTEGER, "
+                                              "id_recipe	INTEGER, "
+                                              "id_ingredient	INTEGER, "
+                                              "number	REAL, "
+                                              "PRIMARY KEY(id AUTOINCREMENT), "
+                                              "FOREIGN KEY(id_recipe) REFERENCES Recipes(id), "
+                                              "FOREIGN KEY(id_ingredient) REFERENCES Ingredients(id) "
+                                          ")";
+        QString quer2 = "CREATE TABLE Ingredients ("
+                                              "id	INTEGER, "
+                                              "Name	text, "
+                                              "Unit	TEXT, "
+                                              "PRIMARY KEY(id AUTOINCREMENT) "
+                                          ")";
+        QString quer3 = "CREATE TABLE Recipes ("
+                    "id	INTEGER, "
+                    "Name	TEXT, "
+                    "Category	TEXT, "
+                    "Description	TEXT, "
+                    "Link	TEXT, "
+                    "PRIMARY KEY(id AUTOINCREMENT)"
+                ")";
+        qDebug() << quer1;
+        model = new QSqlQueryModel;
+        if (qr.exec(quer1) && qr.exec(quer2) && qr.exec(quer3))
+        {
+            model->setQuery(quer3);
+            model->setQuery(quer2);
+            model->setQuery(quer1);
+            //ui->tableView->setModel(model);
+            qDebug() << "here";
+        }
+    }
+    else
+        ui->statusBar->showMessage("db have error: "+ db.lastError().databaseText());
 
 void MainWindow::on_comboBox_2_activated(const QString &arg1)
 {
@@ -285,5 +372,4 @@ void MainWindow::on_comboBox_2_activated(const QString &arg1)
      model->setQuery(query);
      ui->tableView->setModel(model);
    }
-
 }

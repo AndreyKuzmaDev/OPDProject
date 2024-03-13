@@ -159,8 +159,10 @@
     <property name="title">
      <string>Файл</string>
     </property>
-    <addaction name="actionUpdateDB"/>
+    <addaction name="actionCreateDB"/>
+    <addaction name="actionOpenDB"/>
     <addaction name="separator"/>
+    <addaction name="actionUpdateDB"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -176,6 +178,16 @@
   <action name="actionUpdateDB">
    <property name="text">
     <string>Обновить базу данных</string>
+   </property>
+  </action>
+  <action name="actionCreateDB">
+   <property name="text">
+    <string>Создать</string>
+   </property>
+  </action>
+  <action name="actionOpenDB">
+   <property name="text">
+    <string>Открыть</string>
    </property>
   </action>
  </widget>

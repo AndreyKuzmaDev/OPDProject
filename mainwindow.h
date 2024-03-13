@@ -41,6 +41,10 @@ private slots:
 
     void on_actionUpdateDB_triggered();
 
+    void on_actionOpenDB_triggered();
+
+    void on_actionCreateDB_triggered();
+
     void on_comboBox_2_activated(const QString &arg1);
 
 signals:
