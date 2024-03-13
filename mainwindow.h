@@ -1,6 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-#include <vector>
+#include <QVector>
 #include <string>
 #include <QMainWindow>
 #include <QtSql/QSqlDatabase>
@@ -14,6 +14,7 @@
 #include <QFrame>
 #include <QPoint>
 #include <QThread>
+#include <QComboBox>
 
 
 using namespace std;
@@ -44,6 +45,8 @@ private slots:
 
     void on_actionCreateDB_triggered();
 
+    void on_comboBox_2_activated(const QString &arg1);
+
 signals:
     void doUpdate(const QStringList &params);
 
@@ -51,7 +54,10 @@ private:
     Ui::MainWindow *ui;
     QSqlDatabase db;
     QSqlQueryModel *model;
-
+    QVector<QString> words;
+    QString LowSearch;
+    QString tmp;
+    QString NotFillter;
 
     bool dbReady;
 };
