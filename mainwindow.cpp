@@ -28,39 +28,6 @@ MainWindow::MainWindow(QWidget *parent) :
     workerThread.start();
 
     ui->setupUi(this);
-
-    db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("C:/Users/acer/Desktop/SQLiteDatabaseBrowserPortable/delicious.db");
-
-// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if(db.open())
-    {
-        QStringList tempik;
-        QString tmp;
-        QSqlQuery qr;
-        QString quer = "SELECT DISTINCT	Category  FROM Recipes";
-
-        QSqlQueryModel *modeltmp = new QSqlQueryModel;
-
-        if (qr.exec(quer))
-
-        {
-             modeltmp->setQuery(quer);
-            for (int row = 0; row < modeltmp->rowCount(); ++row)
-            {
-                QModelIndex index = modeltmp->index(row, 0);
-                tmp = modeltmp->data(index).toString();
-                //qDebug() << tmp;
-                tempik << tmp;
-            }
-           //NotFillter = ui->comboBox_2->itemText(0);
-           //qDebug() << NotFillter;
-            ui->comboBox_2->addItems(tempik);
-        }
-
-    }
-    else
-        ui->statusBar->showMessage("db have error: "+ db.lastError().databaseText());
 }
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -253,6 +220,8 @@ void MainWindow::on_actionUpdateDB_triggered()
 void MainWindow::DBUpdateDone()
 {
     dbReady = true;
+    get_cathegories();
+
 }
 
 void MainWindow::on_actionOpenDB_triggered()
@@ -269,6 +238,7 @@ void MainWindow::on_actionOpenDB_triggered()
     if(db.open())
     {
         ui->statusBar->showMessage("db is open: " + db.databaseName());
+        get_cathegories();
     }
     else
         ui->statusBar->showMessage("db have error: "+ db.lastError().databaseText());
@@ -330,6 +300,8 @@ void MainWindow::on_actionCreateDB_triggered()
     }
     else
         ui->statusBar->showMessage("db have error: "+ db.lastError().databaseText());
+}
+
 
 void MainWindow::on_comboBox_2_activated(const QString &arg1)
 {
@@ -372,4 +344,31 @@ void MainWindow::on_comboBox_2_activated(const QString &arg1)
      model->setQuery(query);
      ui->tableView->setModel(model);
    }
+}
+
+
+void MainWindow::get_cathegories()
+{
+    QStringList cathegories;
+    QString tmp;
+    QSqlQuery qr;
+    QString quer = "SELECT DISTINCT	Category  FROM Recipes";
+
+    QSqlQueryModel *modeltmp = new QSqlQueryModel;
+
+    if (qr.exec(quer))
+
+    {
+         modeltmp->setQuery(quer);
+        for (int row = 0; row < modeltmp->rowCount(); ++row)
+        {
+            QModelIndex index = modeltmp->index(row, 0);
+            tmp = modeltmp->data(index).toString();
+            //qDebug() << tmp;
+            cathegories << tmp;
+        }
+       //NotFillter = ui->comboBox_2->itemText(0);
+       //qDebug() << NotFillter;
+        ui->comboBox_2->addItems(cathegories);
+    }
 }

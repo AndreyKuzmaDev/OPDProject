@@ -60,6 +60,8 @@ private:
     QString NotFillter;
 
     bool dbReady;
+
+    void get_cathegories();
 };
 
 #endif // MAINWINDOW_H
