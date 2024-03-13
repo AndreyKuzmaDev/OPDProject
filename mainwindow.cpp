@@ -45,6 +45,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    workerThread.exit();
+    delete model;
     delete ui;
 }
 
@@ -239,11 +241,46 @@ void MainWindow::on_actionCreateDB_triggered()
         return;
 
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(path + name);
+    db.setDatabaseName(path + "/" + name);
 
     if(db.open())
     {
         ui->statusBar->showMessage("db is open: " + db.databaseName());
+
+        QSqlQuery qr;
+        QString quer1 = "CREATE TABLE Composition ( "
+                                              "id	INTEGER, "
+                                              "id_recipe	INTEGER, "
+                                              "id_ingredient	INTEGER, "
+                                              "number	REAL, "
+                                              "PRIMARY KEY(id AUTOINCREMENT), "
+                                              "FOREIGN KEY(id_recipe) REFERENCES Recipes(id), "
+                                              "FOREIGN KEY(id_ingredient) REFERENCES Ingredients(id) "
+                                          ")";
+        QString quer2 = "CREATE TABLE Ingredients ("
+                                              "id	INTEGER, "
+                                              "Name	text, "
+                                              "Unit	TEXT, "
+                                              "PRIMARY KEY(id AUTOINCREMENT) "
+                                          ")";
+        QString quer3 = "CREATE TABLE Recipes ("
+                    "id	INTEGER, "
+                    "Name	TEXT, "
+                    "Category	TEXT, "
+                    "Description	TEXT, "
+                    "Link	TEXT, "
+                    "PRIMARY KEY(id AUTOINCREMENT)"
+                ")";
+        qDebug() << quer1;
+        model = new QSqlQueryModel;
+        if (qr.exec(quer1) && qr.exec(quer2) && qr.exec(quer3))
+        {
+            model->setQuery(quer3);
+            model->setQuery(quer2);
+            model->setQuery(quer1);
+            //ui->tableView->setModel(model);
+            qDebug() << "here";
+        }
     }
     else
         ui->statusBar->showMessage("db have error: "+ db.lastError().databaseText());
