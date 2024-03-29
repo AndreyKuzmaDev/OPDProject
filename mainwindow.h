@@ -37,6 +37,7 @@ public slots:
 
 private slots:
     void on_search_clicked();
+
     void on_tableView_doubleClicked(const QModelIndex &index);
 
     void on_actionUpdateDB_triggered();
@@ -53,11 +54,11 @@ signals:
 private:
     Ui::MainWindow *ui;
     QSqlDatabase db;
-    QSqlQueryModel *model;
-    QVector<QString> words;
-    QString LowSearch;
-    QString tmp;
-    QString NotFillter;
+    QSqlQueryModel *model;//basic model
+    QVector<QString> words;//all words in search
+    QString LowSearch;//Processed string for sqlQuery
+    QString tmp;//current category
+
 
     bool dbReady;
 
