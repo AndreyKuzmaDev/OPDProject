@@ -41,3 +41,6 @@ FORMS += \
 DISTFILES += \
     scripts/data_transfer.exe \
     scripts/delicious.db
+
+RESOURCES += \
+    res.qrc
