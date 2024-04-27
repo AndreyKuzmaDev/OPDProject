@@ -14,6 +14,9 @@
 #include <QUrl>
 #include<QAbstractItemView>
 
+#include <QPixmap>
+#include <QPalette>
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -36,18 +39,57 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
       ui->statusBar->hide();
-      ui->menuBar->setStyleSheet("background-color: rgb(198, 227, 245);color: rgb(0, 0, 0);");
+
+
+
+      QPixmap backgroundImage(":/new/prefix1/Frame 3 1.png");
+      QPalette palette;
+      palette.setBrush(this->backgroundRole(), QBrush(backgroundImage));
+      this->setPalette(palette);
+
+
       ui->lineEdit->setPlaceholderText("Please connect the database...");
 
-      this->setStyleSheet("background-color: rgb(197, 216, 109);");
 
-      ui->search->setStyleSheet("background-color: rgb(198, 227, 245);color: rgb(0, 0, 0);");
-      ui->comboBox_2->setStyleSheet("background-color: rgb(247, 247, 242);color: rgb(0, 0, 0);");
+     // this->setStyleSheet("background-color: rgb(130, 149, 150);");
+      ui->menuBar->setStyleSheet("background-color:rgb(198, 227, 245);font:  14px \"Arial\" ;");
+
+        ui->search->setStyleSheet("QPushButton {"
+                                  "background-color: rgb(198, 227, 245);"
+                                                        "border-style: outset;"
+                                                        "border-width: 2px;"
+                                                        "border-radius: 7px;"
+                                                        "border-color: #7f7f7f;"
+                                                        "font: bold 14px;"
+                                                        "min-width: 10em;"
+                                                        "padding: 5px ;"
+                                                        "}"
+                                                        "QPushButton:pressed {"
+                                                        "background-color: rgb(170, 200, 255);"
+                                                        "border-style:inset;"
+                                                         "border-width: 4px;"
+                                                        "}");
+
+      ui->comboBox_2->setStyleSheet("background-color: rgb(247, 247, 242);color: rgb(0, 0, 0);  border: 1px solid gray; border-radius: 7px;border: 2px solid #7f7f7f;padding: 1px 18px 1px 3px;");
       ui->comboBox_2->setView(new QListView());
 
-      ui->lineEdit->setStyleSheet("background-color: rgb(247, 247, 242);");
-       ui->textBrowser->setStyleSheet("background-color: rgb(247, 247, 242);");
-        ui->tableView->setStyleSheet("background-color: rgb(247, 247, 242);");
+      ui->lineEdit->setStyleSheet("background-color: rgb(247, 247, 242);"
+                                 "border: 2px solid #7f7f7f;"
+                                 "border-radius: 7px;"
+                                 "padding: 5px;"
+                                 "selection-background-color: rgb(198, 227, 245);"
+                                 "font:  14px \"Arial\" ;");
+
+       ui->textBrowser->setStyleSheet("background-color: rgb(247, 247, 242);border-radius: 7px;border: 2px solid #7f7f7f;");
+
+       // ui->tableView->setStyleSheet("background-color: rgb(247, 247, 242);");
+       ui->tableView->verticalHeader()->hide();
+
+       ui->tableView->setStyleSheet("QTableView { background-color: rgb(247, 247, 242);"
+                                      "             color: black;border-radius: 7px;border: 2px solid #7f7f7f;"
+                                      "             selection-background-color:  rgb(198, 227, 245);"
+                                    "   font:  14px \"Arial\" }"
+                                    "QHeaderView::section { background-color: lightblue; color: black; border: 1px solid gray;}");
 
 }
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,6 +209,7 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
 {
 
     ui->textBrowser->clear();
+
     if (index.isValid()) {
         QString first = index.sibling(index.row(), 0).data().toString(); // recipeName
         //QString second = index.sibling(index.row(), 1).data().toString();// categoryName
@@ -213,8 +256,8 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
 
                     result.clear();
                     tmp.clear();
-
                     first.clear();
+
                     QModelIndex index = model2->index(row, 0);
                      result = model2->data(index).toString();
 
@@ -242,8 +285,9 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
 
            //qDebug() <<result + tmp << tempLength;
 
+            //  ui->textBrowser->;
               ui->textBrowser->insertHtml(result);
-              ui->textBrowser->insertPlainText(first+"\t\t" + tmp + "\n");
+              ui->textBrowser->insertPlainText(first+"    " + tmp + "\n");
             }
         }
 
@@ -454,5 +498,4 @@ void MainWindow::get_cathegories()//methods for combobox
       }
         delete modeltmp;
             return;
-
 }
