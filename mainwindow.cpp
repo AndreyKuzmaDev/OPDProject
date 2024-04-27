@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
       ui->statusBar->hide();
-
+      ui->menuBar->setStyleSheet("background-color: rgb(198, 227, 245);color: rgb(0, 0, 0);");
       ui->lineEdit->setPlaceholderText("Please connect the database...");
 
       this->setStyleSheet("background-color: rgb(197, 216, 109);");
