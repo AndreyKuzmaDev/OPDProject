@@ -13,8 +13,9 @@
 #include <QDebug>
 #include <QFrame>
 #include <QPoint>
-#include <QThread>
+#include <qthread.h>
 #include <QComboBox>
+#include "db_manager.h"
 
 
 using namespace std;
@@ -53,16 +54,19 @@ signals:
 
 private:
     Ui::MainWindow *ui;
+
+    DB_manager manager;
+
     QSqlDatabase db;
     QSqlQueryModel *model;//basic model
     QVector<QString> words;//all words in search
     QString LowSearch;//Processed string for sqlQuery
-    QString tmp;//current category
+    QString cathegory;//current category
 
 
     bool dbReady;
 
-    void get_cathegories();
+    void set_cathegories();
 };
 
 #endif // MAINWINDOW_H

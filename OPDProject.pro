@@ -27,13 +27,15 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     methods.cpp \
-    script.cpp
+    script.cpp \
+    db_manager.cpp
 
 HEADERS += \
         mainwindow.h \
     methods.h \
     methods.h \
-    script.h
+    script.h \
+    db_manager.h
 
 FORMS += \
         mainwindow.ui
