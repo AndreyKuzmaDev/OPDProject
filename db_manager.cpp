@@ -7,7 +7,7 @@ DB_manager::DB_manager()
 }
 
 
-QSqlQueryModel* DB_manager::search(QString request, QString cathegory)
+void DB_manager::search(QString request, QString cathegory)
 {
 
     model = new QSqlQueryModel;
@@ -15,13 +15,13 @@ QSqlQueryModel* DB_manager::search(QString request, QString cathegory)
     if (!db_ready)
     {
         qDebug() << "DB is currently updating, pls wait";
-        return model;
+        emit search_done(model);
     }
 
     if (!db.open())
     {
         qDebug() << "DB isn't open, pls open something";
-        return model;
+        emit search_done(model);
     }
 
     request.remove(QChar(' '), Qt::CaseInsensitive);//Voda,Voda
@@ -96,11 +96,11 @@ QSqlQueryModel* DB_manager::search(QString request, QString cathegory)
         model->setQuery(query);
         model->setHeaderData(0,Qt::Horizontal,"Recipes", Qt::DisplayRole);
     }
-    return model;
+    emit search_done(model);
 }
 
 
-bool DB_manager::openDB(QString path)
+void DB_manager::open_DB(QString path)
 {
     if (db.open())
         db.close();
@@ -108,11 +108,21 @@ bool DB_manager::openDB(QString path)
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(path);
 
-    return db.open();
+    QString message;
+    if (db.open())
+    {
+        message = get_name();
+        get_cathegories();
+    }
+    else
+    {
+        message = get_err();
+    }
+    emit DB_opened(db.open(), message, &cathegories);
 }
 
 
-bool DB_manager::createDB(QString path, QString name)
+void DB_manager::create_DB(QString path, QString name)
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(path + "/" + name);
@@ -155,7 +165,25 @@ bool DB_manager::createDB(QString path, QString name)
         }
     }
 
-    return db.open();
+    QString message;
+    if (db.open())
+    {
+        message = get_name();
+        get_cathegories();
+    }
+    else
+    {
+        message = get_err();
+    }
+
+    emit DB_created(db.open(), message, &cathegories);
+}
+
+
+void DB_manager::get_cathegories_slot()
+{
+    get_cathegories();
+    emit got_cathegories(&cathegories);
 }
 
 
@@ -171,9 +199,8 @@ QString DB_manager::get_err()
 }
 
 
-QStringList DB_manager::get_cathegories()
+void DB_manager::get_cathegories()
 {
-    QStringList cathegories;
     QString tmp;
     QSqlQuery qr;
     QString quer = "SELECT DISTINCT	Category  FROM Recipes";
@@ -188,14 +215,14 @@ QStringList DB_manager::get_cathegories()
         {
             QModelIndex index = modeltmp->index(row, 0);
             tmp = modeltmp->data(index).toString();
-            cathegories << tmp;
+            if (cathegories.contains(tmp) == false)
+                cathegories << tmp;
         }
     }
     delete modeltmp;
-    return cathegories;
 }
 
-QString DB_manager::get_recipe_details(QString recipe_name)
+void DB_manager::get_recipe_details(QString recipe_name)
 {
     QSqlQuery qr;
     QString quer = "SELECT i.Name,c.number,i.Unit "    // all ingredients for current recipe
@@ -207,7 +234,7 @@ QString DB_manager::get_recipe_details(QString recipe_name)
     QSqlQueryModel *model2 = new QSqlQueryModel;// new model for a simultaneosly process
 
     QString result = "<div><div style='text-align: left;'><center>ingredients<\center></div><br/>";
-
+    bool contains;
     if (qr.exec(quer))
     {
         model2->setQuery(quer);
@@ -238,14 +265,19 @@ QString DB_manager::get_recipe_details(QString recipe_name)
             }
 
             int tempLength = maxlength - ingredient.length();
-
+            contains = false;
             for(QString i : words)
             {
                 if(i == ingredient)
-                    result  += "<b>" + ingredient +"</b>"; // teg <s> for crossing out
-                else
-                    result += ingredient;
+                {
+                    contains = true;
+                    break;
+                }
             }
+            if (contains)
+                result  += "<b>" + ingredient +"</b>"; // teg <s> for crossing out
+            else
+                result += ingredient;
 
             result += QString(tempLength + 4, '.') + amount + "<br/>";
         }
@@ -264,7 +296,7 @@ QString DB_manager::get_recipe_details(QString recipe_name)
     }
     result += "<\div>";
     delete model2;
-    return result;
+    emit got_recipe_details(result);
 }
 
 

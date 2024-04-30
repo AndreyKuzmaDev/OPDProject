@@ -8,10 +8,10 @@ class Script : public QThread
     Q_OBJECT
 
 public slots:
-    void updateDB(const QStringList &params);
+    void update_DB(const QStringList &params);
 
 signals:
-    void DBUpdated();
+    void DB_updated();
 };
 
 #endif // SCRIPT_H
