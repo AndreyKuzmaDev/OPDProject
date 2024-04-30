@@ -31,7 +31,6 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
-    methods.h \
     script.h \
     db_manager.h
 
