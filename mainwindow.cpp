@@ -31,13 +31,31 @@ MainWindow::MainWindow(QWidget *parent) :
     // qDebug() << QCoreApplication::applicationDirPath();
 
     Script *updater = new Script;
-    updater->moveToThread(&workerThread);
+    updater->moveToThread(&updater_thread);
 
-    connect(&workerThread, &QThread::finished, updater, &QObject::deleteLater);
-    connect(this, &MainWindow::doUpdate, updater, &Script::updateDB);
-    connect(updater, &Script::DBUpdated, this, &MainWindow::DBUpdateDone);
+    connect(&updater_thread, &QThread::finished, updater, &QObject::deleteLater);
+    connect(this, &MainWindow::do_update, updater, &Script::update_DB);
+    connect(updater, &Script::DB_updated, this, &MainWindow::update_done);
 
-    workerThread.start();
+    updater_thread.start();
+
+    DB_manager *manager = new DB_manager;
+    manager->moveToThread(&manager_thread);
+
+    connect(&manager_thread, &QThread::finished, manager, &QObject::deleteLater);
+    connect(this, &MainWindow::do_search, manager, &DB_manager::search);
+    connect(manager, &DB_manager::search_done, this, &MainWindow::search_done);
+    connect(this, &MainWindow::do_open, manager, &DB_manager::open_DB);
+    connect(manager, &DB_manager::DB_opened, this, &MainWindow::open_done);
+    connect(this, &MainWindow::do_create, manager, &DB_manager::create_DB);
+    connect(manager, &DB_manager::DB_created, this, &MainWindow::create_done);
+    connect(this, &MainWindow::do_get_cathegories, manager, &DB_manager::get_cathegories_slot);
+    connect(manager, &DB_manager::got_cathegories, this, &MainWindow::got_cathegories);
+    connect(this, &MainWindow::do_get_recipe_details, manager, &DB_manager::get_recipe_details);
+    connect(manager, &DB_manager::got_recipe_details, this, &MainWindow::got_recipe_details);
+
+    manager_thread.start();
+
 
     ui->setupUi(this);
     // ui->statusBar->hide();
@@ -93,7 +111,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    workerThread.exit();
+    updater_thread.exit();
     delete model;
     delete ui;
 }
@@ -104,7 +122,13 @@ void MainWindow::on_search_clicked()
     setlocale(LC_ALL, "RUS");
 
     LowSearch = ui->lineEdit->text();
-    ui->tableView->setModel(manager.search(LowSearch, cathegory));
+
+    emit do_search(LowSearch, cathegory);
+}
+
+void MainWindow::search_done(QSqlQueryModel *res)
+{
+    ui->tableView->setModel(res);
 
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     int totalWidth = ui->tableView->width();
@@ -127,9 +151,13 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
         QString recipe_name = index.sibling(index.row(), 0).data().toString(); // recipeName
         // QString second = index.sibling(index.row(), 1).data().toString(); // categoryName
 
-        QString details = manager.get_recipe_details(recipe_name);
-        ui->textBrowser->insertHtml(details);
+        emit do_get_recipe_details(recipe_name);
     }
+}
+
+void MainWindow::got_recipe_details(QString res)
+{
+    ui->textBrowser->insertHtml(res);
 }
 
 
@@ -150,14 +178,19 @@ void MainWindow::on_actionUpdateDB_triggered()
     if (ok && !param[0].isEmpty())
     {
         dbReady = false;
-        emit doUpdate(param);
+        emit do_update(param);
     }
 }
 
-void MainWindow::DBUpdateDone()
+void MainWindow::update_done()
 {
     dbReady = true;
-    set_cathegories();
+    emit do_get_cathegories();
+}
+
+void MainWindow::got_cathegories(QStringList* cathegories)
+{
+    set_cathegories(cathegories);
 }
 
 void MainWindow::on_actionOpenDB_triggered()
@@ -169,17 +202,20 @@ void MainWindow::on_actionOpenDB_triggered()
     if (db.open())
         db.close();
 
-    bool res = manager.openDB(path);
+    emit do_open(path);
+}
 
+void MainWindow::open_done(bool res, QString message, QStringList* cathegories)
+{
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if(res)//ask Lev Olegovich
     {
-        ui->statusBar->showMessage("db is open: " + manager.get_name());
-        set_cathegories();
+        ui->statusBar->showMessage("db is open: " + message);
+        set_cathegories(cathegories);
         ui->lineEdit->setPlaceholderText("Enter available ingredients...");
     }
     else
-        ui->statusBar->showMessage("db have error: "+ manager.get_err());
+        ui->statusBar->showMessage("db have error: " + message);
 }
 
 void MainWindow::on_actionCreateDB_triggered()
@@ -195,15 +231,18 @@ void MainWindow::on_actionCreateDB_triggered()
     if (!ok)
         return;
 
-    bool res = manager.createDB(path, name);
+    emit do_create(path, name);
+}
 
+void MainWindow::create_done(bool res, QString message, QStringList* cathegories)
+{
     if(res)
     {
         ui->lineEdit->setPlaceholderText("Enter available ingredients...");
-        ui->statusBar->showMessage("db is open: " + name);
+        ui->statusBar->showMessage("db is open: " + message);
     }
     else
-        ui->statusBar->showMessage("db have error: "+ db.lastError().databaseText());
+        ui->statusBar->showMessage("db have error: "+ message);
 }
 
 
@@ -213,9 +252,7 @@ void MainWindow::on_comboBox_2_activated(const QString &arg1)
 }
 
 
-void MainWindow::set_cathegories()//methods for combobox
+void MainWindow::set_cathegories(QStringList* cathegories)//methods for combobox
 {
-
-    QStringList cathegories = manager.get_cathegories();
-    ui->comboBox_2->addItems(cathegories);
+    ui->comboBox_2->addItems(*cathegories);
 }

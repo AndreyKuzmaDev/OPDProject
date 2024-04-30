@@ -2,7 +2,7 @@
 #include <QProcess>
 #include <QDebug>
 
-void Script::updateDB(const QStringList &params)
+void Script::update_DB(const QStringList &params)
 {
     qDebug() << "Started";
 
@@ -11,5 +11,5 @@ void Script::updateDB(const QStringList &params)
 
     qDebug() << "Finished";
 
-    emit DBUpdated();
+    emit DB_updated();
 }

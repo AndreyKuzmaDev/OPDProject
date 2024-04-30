@@ -27,14 +27,20 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    QThread workerThread;
+    QThread updater_thread;
+    QThread manager_thread;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
 public slots:
-    void DBUpdateDone();
+    void update_done();
+    void search_done(QSqlQueryModel* res);
+    void open_done(bool res, QString message, QStringList* cathegories);
+    void create_done(bool res, QString message, QStringList* cathegories);
+    void got_cathegories(QStringList* cathegories);
+    void got_recipe_details(QString res);
 
 private slots:
     void on_search_clicked();
@@ -50,12 +56,15 @@ private slots:
     void on_comboBox_2_activated(const QString &arg1);
 
 signals:
-    void doUpdate(const QStringList &params);
+    void do_update(const QStringList &params);
+    void do_search(QString request, QString cathegory);
+    void do_open(QString path);
+    void do_create(QString path, QString name);
+    void do_get_cathegories();
+    void do_get_recipe_details(QString recipe_name);
 
 private:
     Ui::MainWindow *ui;
-
-    DB_manager manager;
 
     QSqlDatabase db;
     QSqlQueryModel *model;//basic model
@@ -66,7 +75,7 @@ private:
 
     bool dbReady;
 
-    void set_cathegories();
+    void set_cathegories(QStringList* cathegories);
 };
 
 #endif // MAINWINDOW_H
