@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     // ui->statusBar->hide();
 
-    QPixmap backgroundImage(":/new/prefix1/Frame 3 1.png");
+    QPixmap backgroundImage(":/new/prefix1/Frame 6 (1).png");
     QPalette palette;
     palette.setBrush(this->backgroundRole(), QBrush(backgroundImage));
     this->setPalette(palette);
