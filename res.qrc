@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/new/prefix1">
         <file>Frame 6 (1).png</file>
+        <file>hheh.png</file>
     </qresource>
     <qresource prefix="/res"/>
 </RCC>

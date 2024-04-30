@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Мой холодильник</string>
+   <string>по Вкусу</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -38,22 +38,33 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>120</y>
+      <x>270</x>
+      <y>160</y>
       <width>851</width>
       <height>41</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="lineEdit">
+       <property name="styleSheet">
+        <string notr="true">                                 background-color: rgb(247, 247, 242);
+                                 border: 2px solid #7f7f7f;
+                                border-radius: 7px;
+                                 padding: 5px;
+                                 selection-background-color: rgb(198, 227, 245);
+                                 font:  14px \&quot;Arial\&quot;</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="search">
        <property name="font">
         <font>
-         <family>Agency FB</family>
+         <pointsize>-1</pointsize>
+         <weight>75</weight>
          <italic>false</italic>
+         <bold>true</bold>
         </font>
        </property>
        <property name="autoFillBackground">
@@ -73,7 +84,22 @@
 QPushButton#evilButton:pressed {
     background-color: rgb(224, 0, 0);
     border-style: inset;
-}</string>
+}
+                                  QPushButton {
+                                  background-color: rgb(198, 227, 245);
+                                                        border-style: outset;
+                                                        border-width: 2px;
+                                                        border-radius: 7px;
+                                                        border-color: #7f7f7f;
+                                                        font: bold 14px;
+                                                        min-width: 10em;
+                                                        padding: 5px ;
+                                                        }
+                                                        QPushButton:pressed {
+                                                        background-color: rgb(170, 200, 255);
+                                                        border-style:inset;
+                                                         border-width: 4px;
+                                                        }</string>
        </property>
        <property name="text">
         <string>Поиск</string>
@@ -85,10 +111,10 @@ QPushButton#evilButton:pressed {
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>180</y>
-      <width>1041</width>
-      <height>481</height>
+      <x>150</x>
+      <y>210</y>
+      <width>1091</width>
+      <height>491</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -109,10 +135,12 @@ QPushButton#evilButton:pressed {
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">QComboBox QAbstractItemView :: item
+          <string notr="true">background-color: rgb(247, 247, 242);color: rgb(0, 0, 0);  border: 1px solid gray; border-radius: 7px;border: 2px solid #7f7f7f;padding: 1px 18px 1px 3px;
+QComboBox QAbstractItemView :: item
 { 
 min-height: 40px;
 min-width:40px;
+
 }
 
 </string>
@@ -137,6 +165,13 @@ min-width:40px;
            <width>200</width>
            <height>200</height>
           </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QTableView { background-color: rgb(247, 247, 242);
+                                                   color: black;border-radius: 7px;border: 2px solid #7f7f7f;
+                                                 selection-background-color:  rgb(198, 227, 245);
+                                       font:  16px  \&quot;Arial\&quot; }
+                                                                                                                                               QHeaderView::section { background-color: lightblue; color: black;                     border: 1px solid gray;}</string>
          </property>
         </widget>
        </item>
@@ -173,6 +208,9 @@ min-width:40px;
          <underline>false</underline>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(247, 247, 242);border-radius: 7px;border: 2px solid #7f7f7f;</string>
+       </property>
       </widget>
      </item>
     </layout>
@@ -184,8 +222,11 @@ min-width:40px;
      <x>0</x>
      <y>0</y>
      <width>1400</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color:rgb(198, 227, 245);font:  14px \&quot;Arial\&quot; ;</string>
    </property>
    <widget class="QMenu" name="menu">
     <property name="title">

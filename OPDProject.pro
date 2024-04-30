@@ -26,14 +26,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    methods.cpp \
     script.cpp \
     db_manager.cpp
 
 HEADERS += \
         mainwindow.h \
-    methods.h \
-    methods.h \
     script.h \
     db_manager.h
 

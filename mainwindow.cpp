@@ -49,45 +49,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->lineEdit->setPlaceholderText("Please connect the database...");
 
-    // this->setStyleSheet("background-color: rgb(130, 149, 150);");
-    ui->menuBar->setStyleSheet("background-color:rgb(198, 227, 245);font:  14px \"Arial\" ;");
-    ui->search->setStyleSheet("QPushButton {"
-                                  "background-color: rgb(198, 227, 245);"
-                                                        "border-style: outset;"
-                                                        "border-width: 2px;"
-                                                        "border-radius: 7px;"
-                                                        "border-color: #7f7f7f;"
-                                                        "font: bold 14px;"
-                                                        "min-width: 10em;"
-                                                        "padding: 5px ;"
-                                                        "}"
-                                                        "QPushButton:pressed {"
-                                                        "background-color: rgb(170, 200, 255);"
-                                                        "border-style:inset;"
-                                                         "border-width: 4px;"
-                                                        "}");
-
-    ui->comboBox_2->setStyleSheet("background-color: rgb(247, 247, 242);color: rgb(0, 0, 0);  border: 1px solid gray; border-radius: 7px;border: 2px solid #7f7f7f;padding: 1px 18px 1px 3px;");
     ui->comboBox_2->setView(new QListView());
 
-    ui->lineEdit->setStyleSheet("background-color: rgb(247, 247, 242);"
-                                 "border: 2px solid #7f7f7f;"
-                                 "border-radius: 7px;"
-                                 "padding: 5px;"
-                                 "selection-background-color: rgb(198, 227, 245);"
-                                 "font:  14px \"Arial\" ;");
-
-    ui->textBrowser->setStyleSheet("background-color: rgb(247, 247, 242);border-radius: 7px;border: 2px solid #7f7f7f;");
-
-    // ui->tableView->setStyleSheet("background-color: rgb(247, 247, 242);");
     ui->tableView->verticalHeader()->hide();
-
-    ui->tableView->setStyleSheet("QTableView { background-color: rgb(247, 247, 242);"
-                                      "             color: black;border-radius: 7px;border: 2px solid #7f7f7f;"
-                                      "             selection-background-color:  rgb(198, 227, 245);"
-                                    "   font:  14px \"Arial\" }"
-                                    "QHeaderView::section { background-color: lightblue; color: black; border: 1px solid gray;}");
-
 }
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -103,8 +67,11 @@ void MainWindow::on_search_clicked()
 
     setlocale(LC_ALL, "RUS");
 
+    ui->statusBar->clearMessage();
+
     LowSearch = ui->lineEdit->text();
     ui->tableView->setModel(manager.search(LowSearch, cathegory));
+
 
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     int totalWidth = ui->tableView->width();

@@ -9,6 +9,7 @@ DB_manager::DB_manager()
 
 QSqlQueryModel* DB_manager::search(QString request, QString cathegory)
 {
+
     model = new QSqlQueryModel;
 
     if (!db_ready)
@@ -22,6 +23,7 @@ QSqlQueryModel* DB_manager::search(QString request, QString cathegory)
         qDebug() << "DB isn't open, pls open something";
         return model;
     }
+
     request.remove(QChar(' '), Qt::CaseInsensitive);//Voda,Voda
 
     request.insert(0,"'");
