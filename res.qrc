@@ -4,4 +4,7 @@
         <file>hheh.png</file>
     </qresource>
     <qresource prefix="/res"/>
+    <qresource prefix="/">
+        <file>scripts/data_transfer.exe</file>
+    </qresource>
 </RCC>

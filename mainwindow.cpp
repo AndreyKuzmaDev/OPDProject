@@ -134,10 +134,7 @@ void MainWindow::on_actionUpdateDB_triggered()
     bool ok;
     QStringList param;
 
-    if (db.open())
-        param << db.databaseName();
-    else
-        return;
+    param << db_path;
 
     param << QInputDialog::getText(this, QString("Parameters:"), QString("Enter parameters:"), QLineEdit::Normal,
                                    "", &ok).split(' ');
@@ -168,6 +165,7 @@ void MainWindow::on_actionOpenDB_triggered()
 
     if (db.open())
         db.close();
+    db_path = path;
 
     emit do_open(path);
 }
@@ -194,7 +192,7 @@ void MainWindow::on_actionCreateDB_triggered()
     QString name = QInputDialog::getText(this, QString("Name"), QString("Enter new database name:"), QLineEdit::Normal,
                                          "", &ok);
     if(name.isEmpty()) name = DEFAULT_DB_NAME;
-    qDebug() << path + "/" + name;
+    db_path = path + "/" + name;
     if (!ok)
         return;
 

@@ -72,6 +72,7 @@ private:
     QString LowSearch;//Processed string for sqlQuery
     QString cathegory;//current category
 
+    QString db_path;
 
     bool dbReady;
 
