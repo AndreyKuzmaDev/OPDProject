@@ -1,4 +1,5 @@
 #include "db_manager.h"
+#include <QTextCodec>
 
 
 DB_manager::DB_manager()
@@ -24,71 +25,92 @@ void DB_manager::search(QString request, QString cathegory)
         emit search_done(model);
     }
 
-    request.remove(QChar(' '), Qt::CaseInsensitive);//Voda,Voda
-
-    request.insert(0,"'");
-    request.append("'");//'Voda,Voda'
-
-    request = request.toLower();
-    request[1] = request[1].toUpper();
-
-    for (int i = 0; i < request.length(); i++) {
-        if (request[i] == ',') {
-            request[i+1] = request[i+1].toUpper();
-        }
-    }
-
-    for(int i = 0; i < request.length(); i++)
-    {
-        if(request[i]==',')
-        {
-            request.insert(i,"'");
-            request.insert(i+2,"'");
-            i += 1;
-        }
-    }
-    //--------------edit search
-
-    words.clear();//words is liststring for counting
-// /////////////////////////////////////////////////////////////////////////////////////////////
-    const QString separators = " ,;:.\"!?'*\n";
-    int start = request.indexOf(QRegExp("[^" + separators + "]"));
-    while (start != -1)
-    {
-        int end = request.indexOf(QRegExp("[" + separators + "]"), start + 1);
-        if (end == -1)
-            end = request.length();
-
-        words.push_back(request.mid(start, end - start));
-
-        start = request.indexOf(QRegExp("[^" + separators + "]"), end + 1);
-    }
 // ///////////////////////////////////////////////////////////////////////////////////////////////
 
     QSqlQuery qry;
     QString query;
 
-    if(cathegory == CATHEGORY_EMPTY)//if not fillter or fillter = bez filltracii
+    if(request.isEmpty())
     {
-        query = "SELECT r.name, r.Category "
-                    "FROM Recipes r "
-                    "JOIN Composition c ON r.id = c.id_recipe "
-                    "JOIN Ingredients i ON c.id_ingredient = i.id "
-                    "WHERE i.name IN (" + request + ")"
-                    "GROUP BY r.name "
-                    "HAVING COUNT(DISTINCT c.id_ingredient) = " + QString::number((int)words.size());
-    }
+        if(cathegory == CATHEGORY_EMPTY)//if not fillter or fillter = bez filltracii
+        {
+            query = "SELECT r.name, r.Category "
+                        "FROM Recipes r "
+                        "GROUP BY r.name ";
+        }
 
-    else// else query with selected category
+        else// else query with selected category
+        {
+            query = "SELECT r.name, r.Category "
+                            "FROM Recipes r "
+                            "WHERE  r.Category = '"+ cathegory +"' "
+                            "GROUP BY r.name ";
+        }
+    }
+    else
     {
-        query = "SELECT r.name, r.Category "
+        request.remove(QChar(' '), Qt::CaseInsensitive);//Voda,Voda
+
+        request.insert(0,"'");
+        request.append("'");//'Voda,Voda'
+
+        request = request.toLower();
+        request[1] = request[1].toUpper();
+
+        for (int i = 0; i < request.length(); i++) {
+            if (request[i] == ',') {
+                request[i+1] = request[i+1].toUpper();
+            }
+        }
+
+        for(int i = 0; i < request.length(); i++)
+        {
+            if(request[i]==',')
+            {
+                request.insert(i,"'");
+                request.insert(i+2,"'");
+                i += 1;
+            }
+        }
+        //--------------edit search
+
+        words.clear();//words is liststring for counting
+    // /////////////////////////////////////////////////////////////////////////////////////////////
+        const QString separators = " ,;:.\"!?'*\n";
+        int start = request.indexOf(QRegExp("[^" + separators + "]"));
+        while (start != -1)
+        {
+            int end = request.indexOf(QRegExp("[" + separators + "]"), start + 1);
+            if (end == -1)
+                end = request.length();
+
+            words.push_back(request.mid(start, end - start));
+
+            start = request.indexOf(QRegExp("[^" + separators + "]"), end + 1);
+        }
+
+        if(cathegory == CATHEGORY_EMPTY)//if not fillter or fillter = bez filltracii
+        {
+            query = "SELECT r.name, r.Category "
                         "FROM Recipes r "
                         "JOIN Composition c ON r.id = c.id_recipe "
                         "JOIN Ingredients i ON c.id_ingredient = i.id "
                         "WHERE i.name IN (" + request + ")"
-                        "AND  r.Category = '"+ cathegory +"' "
                         "GROUP BY r.name "
                         "HAVING COUNT(DISTINCT c.id_ingredient) = " + QString::number((int)words.size());
+        }
+
+        else// else query with selected category
+        {
+            query = "SELECT r.name, r.Category "
+                            "FROM Recipes r "
+                            "JOIN Composition c ON r.id = c.id_recipe "
+                            "JOIN Ingredients i ON c.id_ingredient = i.id "
+                            "WHERE i.name IN (" + request + ")"
+                            "AND  r.Category = '"+ cathegory +"' "
+                            "GROUP BY r.name "
+                            "HAVING COUNT(DISTINCT c.id_ingredient) = " + QString::number((int)words.size());
+        }
     }
 
     if (qry.exec(query))//exec() - bool funct : 1 if  query work,  else 0
@@ -224,6 +246,8 @@ void DB_manager::get_cathegories()
 
 void DB_manager::get_recipe_details(QString recipe_name)
 {
+    setlocale(LC_ALL, "RU");
+    QString taste = QTextCodec::codecForName("CP1251")->toUnicode("по вкусу ");
     QSqlQuery qr;
     QString quer = "SELECT i.Name,c.number,i.Unit "    // all ingredients for current recipe
                    "FROM Recipes r "
@@ -233,7 +257,9 @@ void DB_manager::get_recipe_details(QString recipe_name)
 
     QSqlQueryModel *model2 = new QSqlQueryModel;// new model for a simultaneosly process
 
-    QString result = "<div><div style='text-align: left;'><center>ingredients<\center></div><br/>";
+    QString result = QTextCodec::codecForName("CP1251")->toUnicode("<body><div><center>Ингредиенты:<\center></div><br/>");
+    result += "<table width='100%'><tbody>";
+
     bool contains;
     if (qr.exec(quer))
     {
@@ -254,6 +280,8 @@ void DB_manager::get_recipe_details(QString recipe_name)
         {
             amount.clear();
 
+            result += "<tr>";
+
             QModelIndex index = model2->index(row, 0);
             ingredient = model2->data(index).toString();
 
@@ -264,7 +292,11 @@ void DB_manager::get_recipe_details(QString recipe_name)
                 amount += " ";
             }
 
-            int tempLength = maxlength - ingredient.length();
+            if (amount.contains("grams") || amount.contains(taste))
+                amount = taste;
+
+
+
             contains = false;
             for(QString i : words)
             {
@@ -274,13 +306,18 @@ void DB_manager::get_recipe_details(QString recipe_name)
                     break;
                 }
             }
+            result += "<td>";
             if (contains)
-                result  += "<b>" + ingredient +"</b>"; // teg <s> for crossing out
+                result += "<b>" + ingredient + "</b>"; // tag <b> for bold
             else
                 result += ingredient;
+            result += "</td>";
 
-            result += QString(tempLength + 4, '.') + amount + "<br/>";
+            result += "<td align='right'>" + amount + "</td>";
+            result += "</tr>";
         }
+
+        result += "</tbody></table>";
     }
 
     quer = "SELECT r.Link "
@@ -292,9 +329,13 @@ void DB_manager::get_recipe_details(QString recipe_name)
         model2->setQuery(quer);
         QModelIndex index = model2->index(0, 0);
         QUrl link(model2->data(index).toString());
-        result  += "<br/><a href=\"" + link.toString() + "\" >this recipe</a>";
+        QString russian_text = QTextCodec::codecForName("CP1251")->toUnicode("\" >Этот рецепт</a>");
+        result  += "<br/><br/><br/><a href=\"" + link.toString() +  russian_text;
     }
-    result += "<\div>";
+
+
+    result += "</body>";
+    qDebug() << result;
     delete model2;
     emit got_recipe_details(result);
 }

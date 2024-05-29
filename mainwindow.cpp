@@ -16,6 +16,7 @@
 
 #include <QPixmap>
 #include <QPalette>
+#include <QTextCodec>
 
 #define DEFAULT_DB_NAME "recipes.db"
 
@@ -76,7 +77,6 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     updater_thread.exit();
-    delete model;
     delete ui;
 }
 
@@ -88,6 +88,9 @@ void MainWindow::on_search_clicked()
     ui->statusBar->clearMessage();
 
     LowSearch = ui->lineEdit->text();
+
+    if (cathegory == QTextCodec::codecForName("CP1251")->toUnicode(CATHEGORY_EMPTY))
+        cathegory = CATHEGORY_EMPTY;
 
     emit do_search(LowSearch, cathegory);
 }
@@ -124,7 +127,7 @@ void MainWindow::on_tableView_doubleClicked(const QModelIndex &index)
 
 void MainWindow::got_recipe_details(QString res)
 {
-    ui->textBrowser->insertHtml(res);
+    ui->textBrowser->setHtml(res);
 }
 
 
