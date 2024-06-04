@@ -29,8 +29,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     dbReady = true;
 
-    // qDebug() << QCoreApplication::applicationDirPath();
-
     Script *updater = new Script;
     updater->moveToThread(&updater_thread);
 
@@ -66,7 +64,7 @@ MainWindow::MainWindow(QWidget *parent) :
     palette.setBrush(this->backgroundRole(), QBrush(backgroundImage));
     this->setPalette(palette);
 
-    ui->lineEdit->setPlaceholderText("Please connect the database...");
+    ui->lineEdit->setPlaceholderText(QTextCodec::codecForName("CP1251")->toUnicode("Подсоедините базу данных..."));
 
     ui->comboBox_2->setView(new QListView());
 
@@ -180,7 +178,7 @@ void MainWindow::open_done(bool res, QString message, QStringList* cathegories)
     {
         ui->statusBar->showMessage("db is open: " + message);
         set_cathegories(cathegories);
-        ui->lineEdit->setPlaceholderText("Enter available ingredients...");
+        ui->lineEdit->setPlaceholderText(QTextCodec::codecForName("CP1251")->toUnicode("Введите доступные ингредиенты..."));
     }
     else
         ui->statusBar->showMessage("db have error: " + message);
@@ -192,7 +190,7 @@ void MainWindow::on_actionCreateDB_triggered()
 
     QString path = QFileDialog::getExistingDirectory(this);
     if(path.isEmpty()) return;
-    QString name = QInputDialog::getText(this, QString("Name"), QString("Enter new database name:"), QLineEdit::Normal,
+    QString name = QInputDialog::getText(this, QString("Name"), QTextCodec::codecForName("CP1251")->toUnicode("Введите название базы данных"), QLineEdit::Normal,
                                          "", &ok);
     if(name.isEmpty()) name = DEFAULT_DB_NAME;
     db_path = path + "/" + name;
@@ -206,7 +204,7 @@ void MainWindow::create_done(bool res, QString message, QStringList* cathegories
 {
     if(res)
     {
-        ui->lineEdit->setPlaceholderText("Enter available ingredients...");
+        ui->lineEdit->setPlaceholderText(QTextCodec::codecForName("CP1251")->toUnicode("Введите доступные ингредиенты"));
         ui->statusBar->showMessage("db is open: " + message);
     }
     else

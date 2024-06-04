@@ -9,14 +9,11 @@ void Script::update_DB(const QStringList &params)
     {
         QFile::remove("C://prog//temp//data_transfer.exe");
     }
-    qDebug() << "Started";
 
-    qDebug() << QFile::copy(":/scripts/data_transfer.exe", "C://prog//temp//data_transfer.exe");
+    QFile::copy(":/scripts/data_transfer.exe", "C://prog//temp//data_transfer.exe");
     QString program("C://prog//temp//data_transfer.exe");
 
-    qDebug() << QProcess::execute(program, params);
-
-    qDebug() << "Finished";
+    QProcess::execute(program, params);
 
     QFile::remove("C://prog//temp//data_transfer.exe");
     emit DB_updated();

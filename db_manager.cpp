@@ -15,13 +15,11 @@ void DB_manager::search(QString request, QString cathegory)
 
     if (!db_ready)
     {
-        qDebug() << "DB is currently updating, pls wait";
         emit search_done(model);
     }
 
     if (!db.open())
     {
-        qDebug() << "DB isn't open, pls open something";
         emit search_done(model);
     }
 
@@ -49,7 +47,28 @@ void DB_manager::search(QString request, QString cathegory)
     }
     else
     {
-        request.remove(QChar(' '), Qt::CaseInsensitive);//Voda,Voda
+        //request.remove(QChar(' '), Qt::CaseInsensitive);//Voda,Voda
+        while(request[0] == ' ')
+            request.remove(0, 1);
+
+        while (request[request.length()-1] == ' ')
+            request.remove(request.length()-1, 1);
+
+        for (int i = 0; i < request.length()-1; i++)
+        {
+            if (request[i] == ' ' && request[i+1] == ' ')
+            {
+                request.remove(i, 1);
+                i--;
+            }
+            if (request[i] == ',' && request[i+1] == ' ')
+            {
+                request.remove(i+1, 1);
+                i--;
+            }
+        }
+
+
 
         request.insert(0,"'");
         request.append("'");//'Voda,Voda'
@@ -73,10 +92,9 @@ void DB_manager::search(QString request, QString cathegory)
             }
         }
         //--------------edit search
-
         words.clear();//words is liststring for counting
     // /////////////////////////////////////////////////////////////////////////////////////////////
-        const QString separators = " ,;:.\"!?'*\n";
+        const QString separators = ",;:.\"!?'*\n";
         int start = request.indexOf(QRegExp("[^" + separators + "]"));
         while (start != -1)
         {
@@ -182,7 +200,6 @@ void DB_manager::create_DB(QString path, QString name)
             model->setQuery(quer2);
             model->setQuery(quer1);
             // ui->tableView->setModel(model);
-            // qDebug() << "here";
 
         }
     }
@@ -335,7 +352,6 @@ void DB_manager::get_recipe_details(QString recipe_name)
 
 
     result += "</body>";
-    qDebug() << result;
     delete model2;
     emit got_recipe_details(result);
 }
